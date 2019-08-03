@@ -9,7 +9,7 @@ exclude:
   - "/vendor/"
 
 # Site settings
-title: developerhjg
+title: 소소한 개발일기
 subtitle: "A simple yet classy theme for your Jekyll website or blog"
 email: yolip51@gmail.com
 name: Gong jojin

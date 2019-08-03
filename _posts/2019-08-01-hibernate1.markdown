@@ -1,0 +1,158 @@
+---
+layout: post
+title:  "Hibernate 인스턴스 Criteria"
+date:   2019-08-01 13:47:00
+author: Gongdel
+categories: JPA
+tags:	 Hibernate Criteria Restrictions Join
+cover:  "/assets/instacode.png"
+---
+# Criteria는 무엇인가?
+관계형 DB에서 데이터를 가져올 때, HQL이나 SQL같이 다른 query 언어를 사용한다. 여기서 공통적인 점은 관계형 DB가 이해할 수 있는 새로운 언어집합인 특정 쿼리 언어를 사용한다는 점이다.  
+`Criteria`는 Criterion 객체를 구성하여 엔티티(Entity)를 검색하기 위한 단순화된 API 제공함으로써, 이러한 제한점을 해결해 줍니다.  
+> Ciriteria Vs HQL  
+> + Criteria
+>  + 동적 쿼리(dynamic query)에 적합하다.  
+>    + 동적 쿼리이기 때문에 정적 쿼리인 HQL보다 SQL Injection에 안전하다.
+>  + 오직 데이터를 검색만 할 수 있고, 검색 외의 작업은 불가능하다.
+>  + 페이징 개념(pagination conception)을 지원한다.
+>
+> + HQL
+>  + 정적 쿼리(static query)에 적합하다.
+>  + 검색이나 검색 외의 작업이 모두 가능하다.
+>  + 페이징 개념(pagination conception)을 지원한다.
+>  + Criteria보다 실행속도가 빠르다.
+
+## Hibernate Criteria 예제
+**Book과 Publisher Entity**를 사용하여 데이터를 가져오자.
+
+###### Book.java
+~~~java
+@Entity
+@Table(name = "BOOK")
+public class Book {
+	
+	@Id
+	@GeneratedValue (strategy = GenerationType.AUTO)
+	@Column (name = "BOOK_ID")
+	private long id;
+	
+	@Column(name = "TITLE")
+	private String title;
+	
+	@Column(name = "BOOK_NAME")
+	private String name;
+		
+	@Column(name = "BOOK_DESC")
+	private String description;
+	
+	@Column(name = "ISBN")
+	private String isbn;
+	
+	@Column(name = "PRICE")
+	private long price;
+	
+	@Column(name = "PUBLISHED_DATE")
+	private Date publishDate;
+	
+	@ManyToOne
+	@JoinColumn(name = "PUBLISHER")
+	private Publisher publisher;
+	
+	// Getter, Setter 생략..
+	
+}
+~~~
+
+###### Publisher.java
+~~~java
+@Entity
+@Table(name = "PUBLISHERS")
+public class Publisher {
+	
+	@Id
+	@GeneratedValue (strategy = GenerationType.AUTO)
+	@Column (name = "PUBLISHER_ID")
+	private long id;
+	
+	@Column (name = "PUBLISHER_NAME")
+	private String name;
+	
+	@Column (name = "PUBLISHER_DESC")
+	private String description;
+	
+	// Getter, Setter 생략..
+	
+}
+~~~
+
+기본적인 `Criteria query`의 사용법은 다음과 같다. 
+~~~java
+Criteria criteria = session.createCriteria(Book.class);
+List<Book> books = criteria.list();
+~~~
+위의 코드는 Book table에서 모든 데이터를 가져온다.  
+Sql query 실행 시 다음과 같다.
+~~~
+SELECT book.* ,publisher.* FROM BOOK book LEFT OUTER JOIN PUBLISHERS publisher ON  book.PUBLISHER = publisher.PUBLISHER_ID
+~~~
+위의 예제에서 '*'는  모든 컬럼명을 표현하기 위해서 사용했다.  
+또한 JPA는 **EAGER Type**을 **ManyToOne** 관계에서  Default로 제공하기 때문에, **LEFT OUTER JOIN**을 Publisher entity에 사용한 것이다.
+
+## Criteria의 Restrictons 사용하기
+~~~java
+Criteria criteria = session.createCriteria(Book.class);
+Criterion nameCriterion = Restrictions.eq("name", "Hibernate");
+criteria.add(nameCriterion);
+List<Book> books = criteria.list();
+~~~
+Sql query 실행 시 다음과 같다.
+~~~sql
+SELECT book.* ,publisher.* FROM BOOK book
+	LEFT OUTER JOIN PUBLISHERS publisher ON book.PUBLISHER = publisher.PUBLISHER_ID
+	WHERE book.BOOK_NAME = 'Hibernate'
+~~~
+**AND, OR**을 사용하여 조건을 추가할 수 있다.
+~~~java
+Criteria criteria = session.createCriteria(Book.class)
+	.add(Restrictions.or(
+			Restrictions.like("name", "%Hibernate%"),
+			Restrictions.like("name", "%Java%")
+			)
+	);
+~~~
+Sql query 실행 시 다음과 같다.
+~~~sql
+SELECT book.*,publisher.* FROM BOOK book
+	LEFT OUTER JOIN PUBLISHERS publisher ON book.PUBLISHER = publisher.PUBLISHER_ID
+	WHERE (book.BOOK_NAME LIKE '%Hibernate%' OR book.BOOK_NAME LIKE '%Java%')
+~~~
+
+그 밖의 Restrictions의 메소드  
++ Restrictions.gt(..)
++ Restrictions.lt(..)
++ Restrictions.isEmpty(..)
++ Restrictions.isNotEmpty(..) 
++ Restrictions.isNull(..)
++ Restrictions.between(..)
+
+
+## Criteria의 Ordering Results 사용하기
+결과값을 정렬하기 위해 사용
+~~~java
+Criteria criteria = session.createCriteria(Book.class )
+	.add(Restrictions.like("name", "%Hibernate%"))
+	.addOrder(Order.asc("name"))
+	.addOrder(Order.desc("publishDate"));
+
+List<Book> books = criteria.list();
+~~~
+Sql query 실행 시 다음과 같다.
+~~~sql
+SELECT book.*, publisher.* FROM BOOK book
+		LEFT OUTER JOIN PUBLISHERS publisher ON book.PUBLISHER = publisher.PUBLISHER_ID
+		WHERE book.BOOK_NAME LIKE '%Hibernate%' ORDER BY book.BOOK_NAME ASC,book.PUBLISHED_DATE DESC
+~~~
+참조 자료:
++ <https://www.java4s.com/hibernate/difference-between-hql-and-criteria-query-in-hibernate/>
++ <https://www.devglan.com/hibernate/hibernate-criteria-tutorial>
