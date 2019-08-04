@@ -141,7 +141,7 @@ SELECT book.*,publisher.* FROM BOOK book
 ## Criteria의 Ordering Results 사용하기
 결과값을 정렬하기 위해 사용
 ~~~java
-Criteria criteria = session.createCriteria(Book.class )
+Criteria criteria = session.createCriteria(Book.class)
 	.add(Restrictions.like("name", "%Hibernate%"))
 	.addOrder(Order.asc("name"))
 	.addOrder(Order.desc("publishDate"));
@@ -154,6 +154,68 @@ SELECT book.*, publisher.* FROM BOOK book
 		LEFT OUTER JOIN PUBLISHERS publisher ON book.PUBLISHER = publisher.PUBLISHER_ID
 		WHERE book.BOOK_NAME LIKE '%Hibernate%' ORDER BY book.BOOK_NAME ASC,book.PUBLISHED_DATE DESC
 ~~~
+
+
+## Critera의 연관 데이터 가져오기(join)
+createCriteria()를 사용하여 연관 데이터를 가져옴으로써, 관계된 엔티티(entity)의 제약조건을 지정할 수 있다.  
+'Apress'를 포함한 'name' 컬럼을 가진 publisher 엔티티를 가지고 있으며, 'Hibernate'를 포함한 'name' 컬럼을 가진 Book 엔티티를 가지고 오기 위해서 criteria를 사용해보자.  
+~~~java
+List<Book> lists = session.createCriteria(Book.class)
+	.add(Restrictions.like("name", "%Hibernate%"))
+	.createCriteria("publisher")
+		.add(Restrictions.like("name", "%Apress%"))
+	.list();
+~~~
+Sql query 실행 시 다음과 같다.
+~~~sql
+SELECT book.*,publisher.* FROM BOOK book INNER JOIN PUBLISHERS publisher ON book.PUBLISHER = publisher.PUBLISHER_ID
+	WHERE book.BOOK_NAME LIKE '%Hibernate%'
+		AND publisher.PUBLISHER_NAME LIKE '%Apress%'
+~~~
+
+## Critera의 동적 연관 데이터 가져오기
+이 예제를 설명하기 위해 별도의 엔티티를 생성하는 대신에, Book 엔티티의 publiser의 fetch Type을 Lazy로 바꾼 후, criteria를 통해서 eager Fetch로 가져올 것이다.
+
+###### Book.java의 type 변경
+~~~java
+@ManyToOne(fetch= FetchType.LAZY)
+@JoinColumn(name = "PUBLISHER")
+private Publisher publisher;
+~~~
+criteria를 사용하여 데이터를 가져오자.
+~~~java
+List<Book> books = session.createCriteria(Book.class)
+	.add(Restricts.like("name", "%Hibernate%"))
+	.setFetchMode("publisher", FetchMode.EAGER)
+	.list();
+~~~
+
+Sql query 실행 시 다음과 같다.
+~~~sql
+SELECT book.*, publisher.* FROM BOOK book LEFT OUTER JOIN PUBLISHERS publisher ON book.PUBLISHER = publisher.PUBLISHER_ID
+ WHERE book.BOOK_NAME LIKE '%Hibernate%'
+~~~
+
+## SubQuery 사용해보기(위의 LEFT OUTER JOIN 피하기)
+위와 다르게, **publisher 엔티티의 LEFT OUTER JOIN**을 피하고 Lazy 관계를 유지하기 위해서 subquery를 사용한다.  
+
+subquery를 사용하기 위해 DetachedCriteria를 사용해보자.
+> DetachedCriteria는 session 범위 밖에서 query를 만든 다음 임의의 Session을 사용하여 쿼리를 실행할 수 있게 해준다. 
+~~~java
+DetachedCriteria subQuery = DetachedCriteria.forClass(Publisher.class, "publisher")
+	.add(Restrictions.eq("publisher.id", 1))
+	.setProjection(Projections.property("publisher.id")); // Projections는 특정 속성의 컬럼만 필요할 떄 사용가
+
+Criteria books = session.createCriteria(Book.class, "book")
+	.add(Property.forName("book.publisher").notIn(subQuery));
+~~~
+
+Sql query 실행 시 다음과 같다.
+~~~sql
+SELECT book.* FROM BOOK book WHERE book.PUBLISHER NOT IN (SELECT publisher.PUBLISHER_ID AS publisher_id FROM PUBLISHERS publisher WHERE publisher.PUBLISHER_ID = 1)
+~~~
+
 참조 자료:
+
 + <https://www.java4s.com/hibernate/difference-between-hql-and-criteria-query-in-hibernate/>
 + <https://www.devglan.com/hibernate/hibernate-criteria-tutorial>
