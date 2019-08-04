@@ -117,7 +117,11 @@ layout: default
 		</span>
 	</section>
 {% endif %}
-
+{% if page.comments %}
+<div id="post-disqus" class="container">
+    {% include disqus.html %}
+</div>
+{% endif %}
 {% if site.disqus_shortname %}
 {% unless page.disqus_disabled %}
 <section class="disqus">

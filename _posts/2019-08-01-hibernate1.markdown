@@ -1,5 +1,6 @@
 ---
 layout: post
+comments: true
 title:  "Hibernate 인스턴스 Criteria"
 date:   2019-08-01 13:47:00
 author: Gongdel
