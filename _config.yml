@@ -10,9 +10,9 @@ exclude:
 
 # Site settings
 title: 소소한 개발일기
-subtitle: "A simple yet classy theme for your Jekyll website or blog"
+subtitle: "내일 더 나은 개발자가 되기 위해, 오늘을 기록합니다."
 email: yolip51@gmail.com
-name: Gong jojin
+name: Gong hojin
 description: >
   Want, Run, Accomplish
 # Base URL of site (i.e. /blog). It should always start with a slash,

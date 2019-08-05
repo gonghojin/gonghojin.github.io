@@ -1,11 +1,11 @@
 ---
 layout: post
 comments: true
-title:  "Hibernate 인스턴스 Criteria"
+title:  "Hibernate 인스턴스 Criteria 기본 사용법"
 date:   2019-08-01 13:47:00
 author: Gongdel
 categories: JPA
-tags:	 Hibernate Criteria Restrictions Join
+tags:	 Hibernate Criteria Restrictions Join Order
 cover:  "/assets/instacode.png"
 ---
 # Criteria는 무엇인가?
