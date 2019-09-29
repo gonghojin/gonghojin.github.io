@@ -1,8 +1,8 @@
 ---
 layout: post
 comments: true
-title:  "이펙티브 자바 3/E_클래스와 인터페이스
-date:   2019-09-19 22:00:00
+title:  "이펙티브 자바 3/E_클래스와 인터페이스"
+date:   2019-09-28 22:00:00
 author: Gongdel
 categories: Book
 tags:	 Java Book EffectiveJava
