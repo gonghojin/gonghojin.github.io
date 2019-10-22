@@ -28,3 +28,8 @@ cover:  "/assets/instacode.png"
 EnumSet 클래스가 비트 필드 수준의 명료함과 성능을 제공하고 아이템 34에서 설명한 열거 타입의 장점까지 선사하기 때문이다.  
 EnumSet의 유일한 단점이라면 (자바 9까지는 아직) 불변 EnumSet을 만들 수 없다는 것이다. 그래도 향후 릴리스에서는 수정되리라 본다.  
 그때까지는 (명확성과 성능이 조금 희생되지만) Collections.unmodifiableSet으로 EnumSet을 감싸 사용할 수 있다.
+
+## 37. ordinal 인덱싱 대신 EnumMap을 사용하라.
+### 핵심 정리
+배열의 인덱스를 얻기 위해 ordinal을 쓰는 것은 일반적으로 좋지 않으니, 대신 EnumMap을 사용하라.  
+다차원 관계는 EnumMap<..., EnumMap<...>>으로 표현하라. ""애플리케이션 프로그래머는 Enum.ordinal을 (웬만해서는) 사용하지 말아야 한다"(아이템 35)는 일반 원칙의 특수한 사례다.
