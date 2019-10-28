@@ -33,3 +33,13 @@ ModifiWidgetFactory, PMWidgetFactory[WidgetFactory를 상속받는 Concrete Clas
 + AbstractProduct(Window, ScrollBar): `개념적 제품 객체`에 대한 `인터페이스`를 정의한다.
 + ConcreteProduct(MotifiWindow, MotifiScrollBar): 구체적으로 `팩토리가 생성할 객체`를 정의하고, `AbstractProduct가` 정의하는 인터페이스를 구현한다.
 + Client: AbstractFactory와 AbstractProduct 클래스에 선언된 인터페이스를 사용한다.
+
+### 협력 방법
++ 일반적으로 ConcreteFactory 클래스의 인스턴스 한 개가 `런타임`에 만들어 진다. 이 구상 팩토리(concrete factory)는` 어떤 특정 구현을 갖는 제품 객체를` 생성한다.  
+서로 다른 제품 객체를 생성하려면 사용자는 `서로 다른 구상 팩토리를` 사용해야 한다.
++ AbstractFactory는 필요한 제품 객체를 생성하는 책임을 ConcreteFactory 구상 클래스에 위임한다.
+
+### 장점과 단점
+1. 구체적인 클래스를 분리한다.  
+	- 팩토리는 제품 객체를 생성하는 과정과 책임을 캡슐화(ConcreteFactory 구상 클래스에 의해)한 것이기 때문에, 구체적인 구현 클래스가 사용자에게서 분리된다.  
+	제품 클래스 이름이 `구상 팩토리에` 분리되므로, Client 코드에는 나타나지 않는 것이다.
