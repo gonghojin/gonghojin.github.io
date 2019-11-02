@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title:  "Gof 디자인패턴_추상팩토리와 팩토리 메서드"
+title:  "Gof 디자인패턴_추상팩토리"
 date:   2019-10-28 00:00:00
 author: Gongdel
 categories: Book
@@ -69,5 +69,8 @@ ModifiWidgetFactory, PMWidgetFactory[WidgetFactory를 상속받는 Concrete Clas
 	- AbstractFactory에는 생성할 각 제품의 종류별로 서로 다른 연산(CreateProductA(), CreateProductB())을 정의한다.  
 	따라서 새로운 종류의 제품이 추가되면 AbstractFactory의 인터페이스에도 새로운 연산을 추가해야 한다.
 		
-
 ### [예제코드](https://github.com/gonghojin/educations/tree/master/java_designpattern/src/creation/factory/abstractf)
+
+---
+- 참조
+	+ Gof의 디자인 패턴
