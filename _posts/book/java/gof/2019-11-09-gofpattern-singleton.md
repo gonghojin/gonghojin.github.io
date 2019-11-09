@@ -17,7 +17,7 @@ cover:  "/assets/instacode.png"
 + 유일한 인스턴스가 서브클래싱으로 확장되어야 하며, 사용자는 코드의 수정없이 확장된 서브클래스의 인스턴스를 사용할 수 있어야 할 때
 
 ### 구조
-![alt](/Users/gonghojin/Documents/private/git/centrarium-master/assets/gof/images/gof-design-patterns-singleton.png)
+![alt](/assets/gof/images/gof-design-patterns-singleton.png)
 
 + Singleton: Instance() 연산을 정의하여, 유일한 인스턴스로 접근할 수 있도록 한다.
 
