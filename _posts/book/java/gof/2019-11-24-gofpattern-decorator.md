@@ -1,8 +1,8 @@
 ---
 layout: post
 comments: true
-title:  "Gof 디자인패턴_데코레이터(Decorator) 패"
-date:   2019-11-09 00:00:00
+title:  "Gof 디자인패턴_데코레이터(Decorator) 패턴"
+date:   2019-11-24 00:00:00
 author: Gongdel
 categories: Book
 tags:	 Java Book Gof 사내스터디
