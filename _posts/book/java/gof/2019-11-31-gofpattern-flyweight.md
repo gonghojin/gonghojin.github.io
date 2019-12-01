@@ -39,9 +39,86 @@ cover:  "/assets/instacode.png"
 	- Client가 플라이웨이트 객체를 요청하면 FlyweightFactory 객체는 이미 존재하는 인스턴스를 제공하거나 존재하지 않는다면 새로 생성한다.
 + Client
 	- 플라이웨이트 객체에 대한 참조자를 관리하며, 플라이웨이트 객체의 부가적 상태를 저장한다.
+	
+### 협력 방법
++ 플라이웨이트 객체가 기능을 수행하는 데 필요한 상태가 `본질적인 것인지 부가적인 것인지`를 구분해야 한다.  
+	+ 본질적 상태는 `ConcreteFlyweight에 저장`해야 하고, 부가적인 상태는 `사용자가 저장하거나, 연산되어야 하는 다른 상태로` 관리해야 한다.
+		+ 사용자는 연산을 호출할 때 자신에게만 필요한 부가적 상태를 `플라이웨이트 객체에 매개변수로` 전달한다.
++ 사용자는 ConcreteFlyweight의 인스턴스를 직접 만들 수 없다.
+	+ 사용자는 ConcreteFlyweight 객체를 FlyweightFactory 객체에서 얻어야 한다. 그렇게 해야 플라이웨이트 객체를 공유할 수 있다.  
 
+### 결과
+플라이웨이트 패턴은 모두 본질적인 상태로 저장되어 있던 것을 부가적인 상태로 만들기 때문에, 부가적인 상태의 연산과 전송에 드는 런타임 비용이 추가 될 수 있다.  
+하지만 이런 비용은 플라이웨이트 객체의 공유를 통해 저장소 절약이라는 반대급부를 가질 수도 있다. 저장소 절약은 여러 면에서 기능적이다.  
++ 공유해야 하는 인스턴스의 전체 수를 줄일 수 있다.
++ 객체별 본질적 상태의 양을 줄일 수 있다.  
++ 부가적인 상태는 연산되거나 저장될 수 있다.  
+
+더 많은 Flyweight가 공유되거나, 공유할 상태가 많아질수록 저장소는 절약된다.
+
+### 예제 코드
+```java
+public enum FontEffect {
+	BOLD, ITALIC, SUPERSCRIPT, SUBSCRIPT, STRIKETHROUGH
+}
+
+public final class FontData {
+	/**
+	*	weak hash map은 사용하지 않는 FontData의 참조를 제거한다.
+	*	weak hash map의 Value objects는 강한 참조에 의해서 유지되기 때문에, Value는 WeakReferences에서 wrapped 되어야 한다.
+	*/
+	private static final WeakHashMap<FontData, WeakReference<FontData>> flyweightData =
+		new WeakHashMap<>();
+	private final int pointSize;
+	private final String fontFace;
+	private final Color color;
+	private final Set<FontEffect> effects;
+	
+	private FontData(int pointSize, String fontFace, Color color, EnumSet<FontEffect> effects) {
+		this.pointSize = pointSize;
+		this.fontFace = fontFace;
+		this.color = color;
+		this.effects = Collections.unmodifiableSet(effects);
+	}
+	
+	public static FontData create(int pointSize, String fontFace, Color color, FontEffect... effects) {
+		EnumSet<FontEffect> effectsSet = EnumSet.noneOf(FontEffect.class);
+		for (FontEffect fontEffect : effects) {
+			effectsSet.add(fontEffect);
+		}
+		
+		// 객체를 생성하는 데 드는 비용이나 객체가 차지하는 메모리 공간에 대해 걱정할 필요가 없다.
+		FontData data = new FontData(pointSize, fontFace, color, effectsSet);
+		if (!flyweightData.containsKey(data)) {
+			flyweightData.put(data, new WeakReference(data));
+		}
+		
+		// 해시값에 따라 변경불가능한 단일본을 리턴한다.
+		return flyweightData.get(data).get();
+	}
+	 public boolean equals(Object obj) {
+		if (obj instanceof FontData) { 
+			if (obj == this) { 
+				return true; 
+			}
+			FontData other = (FontData) obj;
+			return other.pointSize == pointSize && other.fontFace.equals(fontFace) 
+			&& other.color.equals(color) && other.effects.equals(effects);
+		}
+		
+		return false;
+		}
+
+		@Override
+		public int hashCode() { 
+			return (pointSize * 37 + effects.hashCode() * 13) * fontFace.hashCode();
+		}
+
+		// Getters for the font data, but no setters. FontData is immutable.
+}
+```
 ---
 - 참조
 	+ [Gof의 디자인 패턴](https://www.google.com/search?newwindow=1&sxsrf=ACYBGNTM3TLPpNtM8XVERiP7AyPyLDi3sQ%3A1572758465286&ei=wWO-XfOOEcTGmAWs26i4Cw&q=gof%EC%9D%98+%EB%94%94%EC%9E%90%EC%9D%B8%ED%8C%A8%ED%84%B4&oq=gof&gs_l=psy-ab.1.1.35i39l2j0i67j0j0i131l4j0j0i131.1801221.1802149..1803884...0.1..0.188.465.0j3......0....1..gws-wiz.......0i71.wMtI5vf-WEU)	
-	+ <http://best-practice-software-engineering.ifs.tuwien.ac.at/patterns/facade.html>
-	+ <https://online.visual-paradigm.com/diagrams/examples/class-diagram/gof-design-patterns-facade/>
+	+ <https://ko.wikipedia.org/wiki/%ED%94%8C%EB%9D%BC%EC%9D%B4%EC%9B%A8%EC%9D%B4%ED%8A%B8_%ED%8C%A8%ED%84%B4>
+	+ <https://online.visual-paradigm.com/diagrams/examples/class-diagram/gof-design-patterns-flyweight/>
