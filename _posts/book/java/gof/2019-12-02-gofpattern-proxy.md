@@ -40,6 +40,83 @@ Proxy의 종류
 + RealSubject
 	- 프록시가 대표하는 실제 객체
 
+### 협력 방법
+프록시 클래스는 자신이 받은 요청을 RealSubject 객체에 전달한다.  
+
+### 예제 코드
+~~~java
+interface Image {
+	public void displayImage();
+}
+
+// on System A
+class RealImage implements Image {
+	private String filename;
+	public RealImage(String filename) {
+		this.filename = filename;
+		loadImageFromDisk();
+	}
+	
+	private void loadImageFromDisk() {
+		System.out.println("Loading " + filename);
+	}
+	
+	@Override
+	public void displayImage() {
+		System.out.println("Displaying " + filename);
+	}
+}
+
+// on System B
+class ProxyImage implements Image {
+	private String filename;
+	private Image image;
+	
+	public ProxyImage(String filename) {
+		this.filename = filename;
+	}
+	
+	@Override
+	public void displayImage() {
+		if (image == null) {
+			image = new RealImage(filename);
+		}
+		
+		image.displayImage();
+	}
+}
+
+class ProxyExample {
+	public static void main(String[] args) {
+		Image image1 = new ProxyImage("HiRes_10MB_Photo1");
+		Image image2 = new ProxyImage("HiRes_10MB_Photo2");
+
+		image1.displayImage();
+		image2.displayImage();
+		
+		/*
+		Loading    HiRes_10MB_Photo1
+		Displaying HiRes_10MB_Photo1
+		Loading    HiRes_10MB_Photo2
+		Displaying HiRes_10MB_Photo2
+		*/
+	}
+}
+
+~~~
+
+### 관련 패턴
++ vs Adapter Pattern
+	- Adapter Pattern
+		- 개조할 객체가 정의된 인터페이스와 다른 인터페이스를 제공한다.
+	- Proxy Pattern
+		- 자신이 상대하는 대상과 동일한 인터페이스를 제공한다.
+		- Target이 수행할 연산을 거부할 수도 있기 때문에, 처리 대상이 제공하는 인터페이스의 부분 집합일 수도 있다.
++ vs Decorator Pattern 
+	- Decorator Pattern
+		- 사용 목적이 하나 이상의 서비스를 추가하기 위해 사용
+	- Proxy Pattern
+		- 객체에 대한 접근을 제어하는 목적으로 사용
 ---
 - 참조
 	+ [Gof의 디자인 패턴](https://www.google.com/search?newwindow=1&sxsrf=ACYBGNTM3TLPpNtM8XVERiP7AyPyLDi3sQ%3A1572758465286&ei=wWO-XfOOEcTGmAWs26i4Cw&q=gof%EC%9D%98+%EB%94%94%EC%9E%90%EC%9D%B8%ED%8C%A8%ED%84%B4&oq=gof&gs_l=psy-ab.1.1.35i39l2j0i67j0j0i131l4j0j0i131.1801221.1802149..1803884...0.1..0.188.465.0j3......0....1..gws-wiz.......0i71.wMtI5vf-WEU)	
