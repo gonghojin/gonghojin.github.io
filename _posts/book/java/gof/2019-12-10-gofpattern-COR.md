@@ -45,3 +45,77 @@ cover:  "/assets/instacode.png"
 ##### 단점
 + 메시지 수신이 보장되지 않는다.
 	+ 어떤 객체가 이 처리에 대한 수신을 담당한다는 것을 명시하지 않으므로 요청이 처리된다는 보장은 없다.
+
+## 예제 코드
+~~~java
+abstract class Logger {
+	public static int ERR = 3;
+	public static int NOTICE = 5;
+	public static int DEBUG = 7;
+	protected int mask;
+	
+	// 책임 연쇄의 다음 요소
+	protected Logger next;
+	
+	public Logger setNext(Logger log) {
+		this.next = log;
+		
+		return log;
+	}
+	
+	public void message(String msg, int priority) {
+		if (priority <= mask) {
+			writeMessage(msg);
+		}
+	}
+	
+	abstract protected void writeMessage(String msg);
+}
+
+class StdoutLogger extends Logger {
+	public StdoutLogger(int mask) {
+		this.mask = mask;
+	}
+	
+	@Override
+	protected void writeMessage(String msg) {
+		System.out.println("Writing to stdout: " + msg);
+	}
+}
+
+class EmailLogger extends Logger {
+	public EmailLogger(int mask) {
+		this.mask = mask;
+	}
+	
+	protected void writeMessage(String msg) {
+		System.err.println("Sending to stderr: " + msg);
+	}
+}
+
+public class ChainOfResponsibilityEx {
+	public static void main(String[] args){
+		// Build the chain Of Responsibility
+		Logger logger, logger1;
+		logger1 = logger = new StdoutLogger(Logger.DEBUG);
+		logger1 = logger1.setNext(new EmailLogger(Logger.NOTICE));
+		logger1 = logger1.setNext(new StderrLogger(Logger.ERR));
+    
+		// Handled by StdoutLogger
+		logger.message("Entering function y.", Logger.DEBUG);
+
+		// Handled by StdoutLogger and EmailLogger
+		logger.message("Step1 completed.", Logger.NOTICE);
+
+		// Handled by all three loggers
+		logger.message("An error has occurred.", Logger.ERR);
+	}
+}
+~~~
+
+---
+- 참조
+	+ [Gof의 디자인 패턴](https://www.google.com/search?newwindow=1&sxsrf=ACYBGNTM3TLPpNtM8XVERiP7AyPyLDi3sQ%3A1572758465286&ei=wWO-XfOOEcTGmAWs26i4Cw&q=gof%EC%9D%98+%EB%94%94%EC%9E%90%EC%9D%B8%ED%8C%A8%ED%84%B4&oq=gof&gs_l=psy-ab.1.1.35i39l2j0i67j0j0i131l4j0j0i131.1801221.1802149..1803884...0.1..0.188.465.0j3......0....1..gws-wiz.......0i71.wMtI5vf-WEU)	
+	+ <https://ko.wikipedia.org/wiki/%EC%B1%85%EC%9E%84_%EC%97%B0%EC%87%84_%ED%8C%A8%ED%84%B4>
+	+ <https://online.visual-paradigm.com/diagrams/examples/class-diagram/gof-design-patterns-chain-of-responsibility/>
+
