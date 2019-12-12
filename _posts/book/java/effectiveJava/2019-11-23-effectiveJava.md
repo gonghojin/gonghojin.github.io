@@ -77,3 +77,31 @@ cover:  "/assets/instacode.png"
 빠른 프로그램을 작성하려고 안달하지 말자. 좋은 프로그램을 작성하다 보면 성능은 따라오기 마련이다.  
 하지만 시스템을 설계할 때, API, 네트워크 프로토콜 등을 설계할 때는 성능을 염두해야 한다. 시스템 구현이 완료되었다면 성능을 측정하고 충분히 빠르면 그것으로 끝이다.  
 그렇지 않다면 프로파일러를 사용하고 원인이 되는 지점을 찾아 최적화하라. 가장 먼저 알고리즘을 사용한 곳을 찾아서 살펴 보자.
+
+## 68. 일반적으로 통용되는 명명 규칙을 따르라.
+### 핵심 정리
+표준 명명 규칙을 체화하여 자연스럽게 베어 나오도록 하자. 철차 규칙은 직관적이라 모호한 부분이 적은 데 반해, 문법 규칙은 더 복잡하고 느슨하다.  
+자바 언어 명세의 말을 인용하자면 "오랫동안 따라온 규칙과 충돌한다면 그 규칙을 맹종해서는 안 된다." 상식이 이끄는 대로 따르자.
+
+#### 통용되는 명명 규칙
+
+식별자 타입 | 예
+---- | ----  
+패키지와 모듈 | org.junit.jupiter.api
+클래스와 인터페이스 | Stream, FutureTask, HttpClient
+메서드와 필드 | remove, groupingBy
+상수필드 | MIN_VALUE
+지역변수 | i, denom, houseNum
+타입 매개변수 | T,E,K,V,X,R,U,V,T1,T2
+
+
+
+추가적으로 흔히사용되는 명명 메서드
+
+자주사용되는 메서드 | 예
+---- | ----  
+toType | toString, toArray ..
+asType | asList ..
+typeValue | intValue, longValue ..
+
+etc: from, of, valueOf, instance, getInstance, newInstance, getType, newType 
