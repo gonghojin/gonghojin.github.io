@@ -25,3 +25,20 @@ cover:  "/assets/instacode.png"
 꼭 필요한 곳에만 사용한다면 검사 예외는 프로그램의 안전성을 높여주지만, 남용하면 쓰기 고통스러운 API를 초래한다.  
 API 호출자가 예외 상황에서 복구할 방법이 없다면 비검사 예외를 던지자. 복구가 가능하고 호출자가 그 처리를 해주길 바란다면, 우선 옵셔널을 반환해도 될지 고민하자.  
 옵셔널만으로는 상황을 처리하기에 충분한 정보를 제공할 수 없을 때만 검사 예외를 던지자.
+
+## 72. 표준 예외를 사용하라.
+### 핵심 정리
+예외도 마찬가지로 재사용하는 것이 좋으며, 자바 라이브러리는 대부분 API에서 쓰기에 충분한 수의 예외를 제공한다.  
+하지만 `Exception, RuntimeException, Throwable, Error는 직접 재사용하지 말자.` 이 클래스들은 추상 클래스라고 생각하자.  
+이 예외들은 다른 예외들의 상위 클래스이므로, 즉 여러 성격의 예외들을 포괄하는 클래스이므로 안정적으로 테스트 할 수 없다.
+
+##### 널리 재사용되는 예외
+
+예외 | 주요 쓰임
+---- | ---- 
+IllegalArgumentException | 허용하지 않는 값이 인수로 전달 됬을 때
+IllegalStateException | 객체가 메서드를 수행하기 적절하지 않을 때
+NullPointerException | null을 허용하지 않는 메서드에 null을 건넸을 때
+IndexOutOfBoundsException | 인덱스가 범위를 넘었을 때
+ConcurrentModificationException | 허용하지 않는 동시 수정이 발견됬을 때
+UnsupportedOperationException | 호출한 메서드를 지원하지 않을때 
