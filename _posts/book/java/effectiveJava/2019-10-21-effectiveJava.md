@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title:  "이펙티브 자바 3/E_제네릭"
+title:  "이펙티브 자바 3/E_열거 타입과 애너테이션"
 date:   2019-10-20 22:00:00
 author: Gongdel
 categories: Book
