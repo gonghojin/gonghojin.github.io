@@ -9,7 +9,7 @@ tags:	 Java Book EffectiveJava
 cover:  "/assets/instacode.png"
 ---
 # 5장. 제네릭
-## 26. 로 타입??(로 = raw)은 사용하지 말라.
+## 26. 로 타입은 사용하지 말라.
 ### 제네릭 (한글/영문) 용어 정리 
 
 한글 용어 | 영문 용어 | 예
