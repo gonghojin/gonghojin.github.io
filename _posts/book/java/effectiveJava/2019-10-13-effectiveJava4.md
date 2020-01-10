@@ -62,6 +62,20 @@ Set<Object>, Set<?>는 안전하지만, raw 타입인 Set은 안전하다.
 + 배열은 실체화된다?
 	+ 배열은 런타임에도 자신이 담기로 한 원소의 타입을 인지하고 확인한다. 반면 제네릭은 타입 정보가 런타임에는 소거된다.
 
+##### 배열 대신 리스트를 통해 타입 안정성을 확보하자.
+~~~java
+//배열을 사용할 경우
+public void chooser(Collection<T> choices) {
+    T[] array = (T[]) choices.toArray();
+    ...
+}
+
+//배열을 리스트로 변경
+public void chooser(Collection<T> choices) {
+    List<T> list = new ArrayList<>(choices);
+    ...
+}
+~~~
 ## 29. 이왕이면 제네릭 타입으로 만들라.
 ### 핵심 정리
 클라이언트에서 직접 형변환해야 하는 타입보다 제네릭 타입이 더 안전하고 쓰기 편하다.  
