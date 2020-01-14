@@ -63,6 +63,7 @@ Set<Object>, Set<?>는 안전하지만, raw 타입인 Set은 안전하다.
 	+ 배열은 런타임에도 자신이 담기로 한 원소의 타입을 인지하고 확인한다. 반면 제네릭은 타입 정보가 런타임에는 소거된다.
 
 ##### 배열 대신 리스트를 통해 타입 안정성을 확보하자.
+
 ~~~java
 //배열을 사용할 경우
 public void chooser(Collection<T> choices) {
@@ -76,11 +77,42 @@ public void chooser(Collection<T> choices) {
     ...
 }
 ~~~
+
 ## 29. 이왕이면 제네릭 타입으로 만들라.
 ### 핵심 정리
 클라이언트에서 직접 형변환해야 하는 타입보다 제네릭 타입이 더 안전하고 쓰기 편하다.  
 그러니 새로운 타입을 설계할 때는 형변환 없이도 사용할 수 있도록 하라. 그렇게 하려면 제네릭 타입으로 만들어야 할 경우가 많다.  
 기존 타입 중 제네릭이었어야 하는 게 있다면 제네릭 타입으로 변경하자. 기존 클라이언트에는 아무 영향을 주지 않으면서, 새로운 사용자를 훨씬 편하게 해주는 길이다.
+
+#####  배열을 사용한 코드를 제네릭으로 만드는 방법 1 - 가독성이 좋다( 더 선호하는 방법, 단점은 존재(이팩티브 자바 173쪽))
+~~~java
+public class Stack<E> {
+	...
+	private E[] elements;
+	// 배열 elements는 push(E)로 넘어온 E 인스턴스만 담는다.
+	// 따라서 타입 안전성을 보장하지만, 이 배열의 런타임 타임은 E[]가 아닌 Object[] 다!
+	@SuppressWarnings("uncheked")
+	public Stack() {
+		elements = (E[]) new Object[DEFAULT_INITIAL_CAPACITY];
+	}
+}
+~~~
+
+#####  배열을 사용한 코드를 제네릭으로 만드는 방법 2
+~~~java
+public class Stack<E> {
+	...
+	private Object[] elements;
+	public E pop() {
+		// push에서  E 타입만 허용하므로 이 형변환은 안전하다
+		@SuppressWarnings("uncheked")
+		E result = (E) elements[--size];
+		
+		elements[size] = null; // 다 쓴 참조 해제
+		return result;
+	}
+}
+~~~
 
 ## 30. 이왕이면 제네릭 메서드로 만들라.
 ### 핵심 정리
