@@ -26,6 +26,29 @@ cover:  "/assets/instacode.png"
 이제 자바도 람다를 지원한다. 입력값과 반환값에 함수형 인터페이스 타입을 활용하자. `보통은 java.util.function 패키지의 표준 함수형 인터페이스를` 사용하는 것이 가장 좋은 선택이다.  
 단, 흔치는 않지만 직접 새로운 함수형 인터페이스를 만들어 쓰는 편이 나을 수도 있음을 잊지 말자.
 
+---
+java.util.function 43개의 표준의 함수형 인터페이스가 존재한다.
+
+43개를 모두 알 필요는 없다. 아래 6개의 기본 인터페이스만 알면 나머지 인터페이스를 유추할 수 있다.
+
+기본 인터페이스 | 함수 시그니처 | 예
+---- | ---- | ---- 
+UnaryOperator<T> | T apply(T t)| String::toLowerCase
+BinaryOperator<T> | T apply(T t1, T t2) | BigInteger::add
+Predicate<T> | boolean test(T t) | Collection::isEmpty
+Function<T,R> | R apply(T t) | Arrays::asList
+Supplier<T> | T get() | Instant::now
+Consumer<T> | void accept(T t) | System.out::println
+
+- UnaryOperator : 인수가 1개, 리턴값과 인수 타입이 같은 함수 인터페이스. 
+- BinaryOperator : 인수가 2개, 리턴값과 인수 타입이 같은 함수 인터페이스.
+- Predicate : 인수하나를 받아서, boolean을 리턴하는 함수 인터페이스.
+- Function : 인수와 리턴 타입이 다른 함수 인터페이스.
+- Supplier : 인수를 받지 않고 값을 리턴하는 함수 인터페이스.
+- Consumer : 인수를 1개 받고, 반환값이 없는 함수 인터페이스.
+
+---
+
 ## 45. 스트림은 주의해서 사용하라.
 ### 핵심 정리
 스트림을 사용해야 더 알맞거나, 반복 상식이 더 알맞은 일도 있다. 어느 쪽이 나은지가 확연히 드러나는 경우가 많겠지만, 아니더라도 방법은 있다.  
