@@ -21,6 +21,15 @@ cover:  "/assets/instacode.png"
 대다수 열거 타입이 명시적 생성자나 메서드 없이 쓰이지만, 각 상수를 특정 데이터와 연결짓거나 상수마다 다르게 동작하게 할 때는 필요하다.  
 드물게는 하나의 메서드가 상수별로 다르게 동작해야 할 때도 있다. 이런 열거 타입에서는 switch 문 대신 상수별 메서드 구현을 사용하자. 열거 타입 상수 일부가 같은 동작을 공유한다면 전략 열거 타입 패턴을 사용하자.
 
+~~~
+코드 34-1 정수 열거 패턴 - 상당히 취약하다.
+public static final int APPLE_FUJI = 0;
+public static final int APPLE_PIPPIN = 1;
+~~~
+~~~
+코드 34-2 가장 단순한 열거 타입
+public enum Apple { FUJI, PIPPIN }
+~~~
 ## 35. ordinal 메서드 대신 인스턴스 필드를 사용하라.
 ## 36. 비트 필드 대신 EnumSet을 사용하라.
 ### 핵심 정리
