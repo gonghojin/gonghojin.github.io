@@ -31,6 +31,26 @@ public static final int APPLE_PIPPIN = 1;
 public enum Apple { FUJI, PIPPIN }
 ~~~
 ## 35. ordinal 메서드 대신 인스턴스 필드를 사용하라.
+### 핵심 정리
+모든 열거 타입은 해당 상수가 그 열거 타입에서 몇 번쨰 위치인지를 반환하는 ordinal이라는 메서드를 제공한다.  
+하지만 상수 선언 순서를 바꾸는 순간 해당 메소드로 기반으로 만들어진 프로그램은 오동작할 것이다.  
+따라서 `열거 타입 상수에 연결된 값은 ordinal 메서드로 얻지 말고, 인스턴스 필드에 저장하자.`  
+~~~java
+public enum Ensemble {
+	SOLO(1), DUET(2), TRIO(3), QUARTET(4);
+	
+	private final int numberOfMusicians;
+	Ensemble(int size) {
+		this.numberOfMusicians = size;
+	}
+	
+	// ordinal 역할
+	public int getNumberOfMusicians() {
+		return this.numberOfMusicians;
+	}
+}
+~~~
+
 ## 36. 비트 필드 대신 EnumSet을 사용하라.
 ### 핵심 정리
 열거할 수 있는 타입을 한데 모아 집합 형태로 사용한다고 해도 비트 필드를 사용할 이유는 없다.  
