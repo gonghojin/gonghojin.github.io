@@ -53,7 +53,7 @@ keywords:
 author:
 license: (ISC)
 ~~~
-프로젝트 설정에 대한 몇 가지 질문이 이루어지며, 빈 칸으로 남겨둘 시 기본값 설정으로 `pacakage.json` 파일이 생성된다.  
+프로젝트 설정에 대한 몇 가지 질문이 이루어지며, 빈 칸으로 남겨둘 시 기본값 설정으로 `package.json` 파일이 생성된다.  
 ##### Package.json
 ~~~
 {
@@ -111,4 +111,30 @@ package.json에는 설치한 패키지 정보를 기록한다.
   }
 ~~~
 
-### 2. WebPack
+### 2. WebPack(웹팩)
+#### 2.1 왜 프론트엔드 개발에 WebPack이 필요한가?
+최근 들어 프론트 엔드 프로젝트의 규모가 커짐에 따라, Javascript 코드를 `여러 파일과 폴더에 나누어 작성`하고 서로가 서로를 효율적으로 불러올 수 있도록 해주는 모듈화된 환경으로 개발이 이루어진다.  
+하지만 `모든 브라우져에서 모듈 시스템을 지원하지는 않는다.` 따라서 브라우져에 무관하게 모듈을 사용하기 위해 나온 것이 `웹팩이다.`
+
+#### 2.2 엔트리 / 아웃풋
+웹팩은 여러 개 파일을 하나의 파일로 합쳐주는 번들러(Bundler)다.  
+하나의 시작점(Entry point)에서 의존적인 모듈을 전부 찾아내서 하나의 결과물을 만들어 낸다.
+![https://webpack.js.org/](/assets/educations/images/babel.png)  
+
+간단히 웹팩으로 번들링 작업을 해보자.
+번들 작업을 하는 `webpack` 패키지와 웹팩 터미널 도구인 `webpack-cli`를 설치한다.  
+~~~
+❯ yarn add -D webpack webpack-cli
+~~~
+설치가 완료되면 `node_modules/.bin` 폴더에 실행 가능한 명령어가 몇 개 생긴다.  
+(webpack 또는 webpack-cli를 실행하면 된다.) --help 옵션으로 사용 방법을 확인해 보자.  
+~~~
+❯ ./node_modules/.bin/webpack --help
+~~~
+이 중 --mode, --entry, --output 세 개 옵션만으로 번들링을 할 수 있다.  
++ --mode
+	+ 웹팩 실행 모드는 의미하는데, 개발 버전인 development를 지정한다.
++ --entry
+	+ 시작점 경로를 지정하는 옵션
++ --output
+	+ 번들링 결과물을 위치할 경로
