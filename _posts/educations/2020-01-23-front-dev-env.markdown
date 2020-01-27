@@ -132,9 +132,138 @@ package.json에는 설치한 패키지 정보를 기록한다.
 ❯ ./node_modules/.bin/webpack --help
 ~~~
 이 중 --mode, --entry, --output 세 개 옵션만으로 번들링을 할 수 있다.  
+~~~
+❯ node_modules/.bin/webpack --mode development --entry ./src/app.js --output dist/main.js
+~~~
 + --mode
 	+ 웹팩 실행 모드는 의미하는데, 개발 버전인 development를 지정한다.
 + --entry
 	+ 시작점 경로를 지정하는 옵션
 + --output
 	+ 번들링 결과물을 위치할 경로
+
+또한 옵션 중 --config 통해 웹팩 설정 파일의 경로를 지정할 수 있다.  
+기본 파일명은 webpack.config.js 혹은 webpackfile.js이며, 다음과 같이 사용할 수 있다.
+##### webpack.config.js
+다음과 같이 webpack.config.js 설정을 통해, 위의 터미널에서 사용한 옵션을 대체할 수 있다.
+~~~
+const path = require('path');
+
+module.exports = {
+  mode: 'development',
+  entry: {
+    main: './src/app.js'
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve('./dist'),
+  },
+}
+~~~
++ output에 설정한 '[name]'은 entry에 추가한 main이 문자열로 들어오는 방식이다.  
+	+ output.path에는 절대 경로를 사용하기 떄문에 path  모듈의 resolve() 함수를 사용해서 계산했다. 		
+	(path는 노드 코어 모듈 중 하나로 경로를 처리하는 기능을 제공)  
+	
+웹팩 실행을 위한 NPM 커스텀 명령어를 추가한다.
+##### package.json
+~~~
+{
+  "scripts": {
+    "build": "./node_modules/.bin/webpack"
+  }
+}
+~~~
+모든 옵션을 웹팩 설정 파일로 옮겼기 때문에 단순히 webpack 명령어만 실행한다. 이제부터는 npm run build로 웹팩 작업을 지시할 수 있다.
+
+### 3. 로더
+#### 3.1 로더의 역할
+웹팩은 자바스크립트로 만든 모듈뿐만 아니라, 스타일시트, 이미지, 폰트 등 `모든 파일을 모듈로 바라본다.`  
+따라서 import 구문을 사용하면 자바스크립트 코드 안으로 가져올 수 있다.  
+
+이것을 가능하게 해주는 것이 바로 `웹팩의 로더`이다.  
+로더는 타입스크립트 같은 다른 언어를 자바스크립트 문법으로 변환해 주거나 이미지를 data Url 형식의 문자열로 변환한다.  
+뿐만 아니라 CSS 파일을 자바스크립에서 직접 로딩할 수 있도록 해준다.
+
+#### 3.2 자주 사용하는 로더
+#### 3.2.1 css-loader
+웹팩은 모든 것을 모듈로 바라보기 때문에 스타일시트도 import 구분으로 불러올 수 있다.  
+##### app.js
+~~~
+import './style.css'
+~~~
+##### style.css
+~~~
+body {
+  background-color: green;
+}
+~~~
+하지만 CSS 파일을 자바스크립트에서 불러와 사용하려면 CSS를 모듈로 변환하는 작업이 필요하다.  
+그러한 역할을 해주 것이 `css-loader`이다. 먼저 로더를 설치하자.  
+~~~
+❯ npm install -D css-loader
+~~~
+웹팩 설정에 로더를 추가하자.  
+##### webpack.config.js
+~~~
+module.exports = {
+  module: {
+    rules: [{
+      test: /\.css$/, // .css 확장자로 끝나는 모든 파일 
+      use: ['css-loader'], // css-loader를 적용한다, 경로대신 배열에 문자열로 전달해도 가 
+    }]
+  }
+}
+~~~
+웹팩은 엔트리 포인트부터 시작해서 모듈을 검색하다 CSS 파일을 찾으면 css-loader로 처리한다.    
+
+빌드한 결과, CSS코드가 자바스크립토 변환된 것을 확인할 수 있다.  
+##### main.js
+~~~
+....."body {\r\n\tbackground-color: green;\r
+~~~
+
+#### 3.2.1 style-loader
+모듈로 변경된 스타일시트는 DOM에 추가되어야만 브라우저가 해석할 수 있다.  
+css-loader로 처리하면 자바스크립트 코드로만 변경되었을 뿐 DOM에 적용되진 않는다.  
+따라서 `style-loader`를 통해 자바스크립트로 변경된 스타일시트를 동적으로 DOM에 추가한다.  
+즉, CSS를 번들링하기 위해서는 `css-loader`와 `style-loader`를 함께 사용해야 한다.  
+
+먼저 스타일 로더를 다운로드 한 후, 웹팩 설정에 로더를 추가한다.
+~~~
+❯ npm install -D style-loader
+~~~
+##### webpack.config.js
+~~~
+module.exports = {
+  module: {
+    rules: [{
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader'], // style-loader를 앞에 추가한다 
+    }]
+  }
+}
+~~~
+
+#### 3.2.2 file-loader
+소스 코드에서 사용하는 모든 파일을 모듈로 사용하게끔 할 수 있다.  
+파일을 모듈 형태로 지원하고 웹팩 아웃풋에 파일을 옮겨주는 것이 `file-loader`가 하는 일이다.  
+예를들어, CSS에서 url() 함수에 이미지 파일 경로를 지정할 수 있는데, 웹팩은 file-loader를 사용해서 이 파일을 처리한다.
+##### style.css
+~~~
+body {
+  background-image: url(bg.png);
+}
+~~~
+
+웹팩은 엔트리 포인트인 app.js가 로딩하는 style.css 파일을 읽는다. 그리고 이 스타일시트는 url() 함수로 bg.png를 사용하는데 이때 로더를 동작시킨다.  
+##### webpack.config.js
+~~~
+module.exports = {
+  module: {
+    rules: [{
+      test: /\.png$/, // .png 확장자로 마치는 모든 파일
+      loader: 'file-loader', // 파일 로더를 적용한다
+    }]
+  }
+}
+~~~
