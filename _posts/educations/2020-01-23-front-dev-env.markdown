@@ -266,4 +266,62 @@ module.exports = {
     }]
   }
 }
+~~~ 
+웹팩이 .png 파일을 발견하면 file-loader를 실행한다. 로더가 동작하고 나면 아웃풋에 설정한 경로로 이 파일이 복사된다.  
+(아래 그림처럼 파일명이 해쉬코드로 변경되는데, 캐쉬 갱신을 위한 처리로 보인다.)  
+![https://webpack.js.org/](/assets/educations/images/file_loader_1.png)  
+
+하지만 이대로 index.html 파일을 브라우저에 로딩하면 이미지를 제대로 로딩하지 못한다.  
+CSS를 로딩하면 background-image: url(bg.png) 코드에 의해 동일 폴더에서 이미지를 찾으려고 시도하지만, 웹팩으로 빌드한 이미지 파일은 output인 dist 폴더 아래로 이동했기 떄문이다.  
+따라서 file-loader 옵션을 조정해서 경로를 잡아주어야 한다.
+
+##### webpack.config.js
 ~~~
+module.exports = {
+  module: {
+    rules: [{
+      test: /\.png$/, // .png 확장자로 마치는 모든 파일
+      loader: 'file-loader',
+      options: {
+        publicPath: './dist/', // prefix를 아웃풋 경로로 지정 
+        name: '[name].[ext]?[hash]', // 파일명 형식 
+      }
+    }]
+  }
+}
+~~~
+
++ publicPath
+	+ file-loader가 처리하는 파일을 모듈로 사용할 때 경로 앞에 추가되는 문자열  
+		+ output에 설정한 'dist' 폴더에 이미지 파일을 옮기므로, 해당 값을 지정
+		+ 'bg.png'를 'dist/bg.png'로 변경하여 사용
++ name
+	+ loader가 파일을 아웃풋에 복사할 때 사용할 파일 이름
+	+ 기본적으로 설정된 해쉬값을 쿼리스트링으로 옮겨서 'bg.png?070980c4b3edb776872e80d29760490b' 형식으로 파일을 요청
+
+#### 3.2.4 url-loader
+사용하는 이미지 갯수가 많다면 네트웍 리소스를 사용하는 부담이 있고, 사이트 성능에 영향을 줄 수도 있다.  
+만약 한 페이지에서 작은 이미지를 여러 개 사용한다면 `Data URI Scheme`를 사용하는 것이 더 낫다.  
+이미지를 Base64로 인코딩하여 문자열 형태로 소스코드에 넣는 형식이. url-loader는 이러한 처리를 자동화 해준다.  
+
+##### webpack.config.js
+~~~
+{
+  test: /\.png$/,
+  use: {
+    loader: 'url-loader', // url 로더를 설정한다
+    options: {
+      publicPath: './dist/', // file-loader와 동일
+      name: '[name].[ext]?[hash]', // file-loader와 동일
+      limit: 5000 // 5kb 미만 파일만 data url로 처리 
+    }
+  }
+}
+~~~
+
++ limit
+	+ 모듈로 사용한 파일 중 크기가 '5kb 미만'인 파일만 url-loader를 적용하는 설정
+		+ 만약 이보다 크면 file-loader가 처리하는데 옵션 중 'fallback' 기본 값이 file-loader이기 때문  
+
+아이콘처럼 `용량이 작거나 사용 빈도가 높은 이미지는` 파일을 그대로 사용하기 보다는 Data URI Scheme를 적용하기 위해 url-loader를 사용하면 좋다!!
+
