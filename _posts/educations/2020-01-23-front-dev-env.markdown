@@ -272,7 +272,7 @@ module.exports = {
 ![https://webpack.js.org/](/assets/educations/images/file_loader_1.png)  
 
 하지만 이대로 index.html 파일을 브라우저에 로딩하면 이미지를 제대로 로딩하지 못한다.  
-CSS를 로딩하면 background-image: url(bg.png) 코드에 의해 동일 폴더에서 이미지를 찾으려고 시도하지만, 웹팩으로 빌드한 이미지 파일은 output인 dist 폴더 아래로 이동했기 떄문이다.  
+CSS를 로딩하면 background-image: url(bg.png) 코드에 의해 동일 폴더에서 이미지를 찾으려고 시도하지만, 웹팩으로 빌드한 이미지 파일은 output인 dist 폴더 아래로 이동했기 때문이.  
 따라서 file-loader 옵션을 조정해서 경로를 잡아주어야 한다.
 
 ##### webpack.config.js
@@ -301,7 +301,7 @@ module.exports = {
 
 #### 3.2.4 url-loader
 사용하는 이미지 갯수가 많다면 네트웍 리소스를 사용하는 부담이 있고, 사이트 성능에 영향을 줄 수도 있다.  
-만약 한 페이지에서 작은 이미지를 여러 개 사용한다면 `Data URI Scheme`를 사용하는 것이 더 낫다.  
+만약 한 페이지에서 작 이미지를 여러 개 사용한다면 `Data URI Scheme`를 사용하는 것이 더 낫다.  
 이미지를 Base64로 인코딩하여 문자열 형태로 소스코드에 넣는 형식이. url-loader는 이러한 처리를 자동화 해준다.  
 
 ##### webpack.config.js
@@ -325,3 +325,160 @@ module.exports = {
 
 아이콘처럼 `용량이 작거나 사용 빈도가 높은 이미지는` 파일을 그대로 사용하기 보다는 Data URI Scheme를 적용하기 위해 url-loader를 사용하면 좋다!!
 
+### 4. 플러그인
+### 4.1 플러그인의 역할
+로더가 `파일 단위`로 처리하는 반면, 플러그인은 `번들된 결과물`을 처리한다.  
+번들된 자바스크립트를 난독화한다거나 특정 테스트를 추출하는 용도로 사용한다.  
+
+### 4.2 자주 사용하는 플러그인
+### 4.2.1 BannerPlugin
+BannerPlugin은 결과물에 빌드 정보나 커밋 버전 같은 걸 추가할 수 있다.
+
+##### webpack.config.js
+~~~
+const webpack = require('webpack');
+
+module.exports = {
+  plugins: [
+    new webpack.BannerPlugin({
+      banner: '이것은 배너 입니다',
+    })
+  ]
+}
+~~~
+생성자 함수에 전달하는 옵션 객체의 banner 속성에 문자열을 전달한다.  
+웹팩 컴파일 타임에 얻을 수 있는 정보(예: 빌드시간, 커밋정보)를 전달하기 위해 함수로 전달할 수도 있다.  
+~~~
+new webpack.BannerPlugin({
+  banner: () => `빌드 날짜: ${new Date().toLocaleString()}`
+})
+~~~
+만약 배너 정보가 많다면 별도 파일로 분리해서 사용하자.
+~~~
+const banner = require('./banner.js');
+
+new webpack.BannerPlugin(banner);
+~~~
+
+빌드 날짜 외에 커밋 해쉬와 빌드한 유저 정보까지 추가해보자
+##### banner.js
+~~~
+const childProcess = require('child_process');
+
+module.exports = function banner() {
+  const commit = childProcess.execSync('git rev-parse --short HEAD')
+  const user = childProcess.execSync('git config user.name')
+  const date = new Date().toLocaleString();
+  
+  return (
+    `commitVersion: ${commit}` +
+    `Build Date: ${date}\n` +
+    `Author: ${user}`
+  );
+}
+~~~
+
+##### 빌드한 뒤 플로그인이 처리한 결과
+![https://webpack.js.org/](/assets/educations/images/plugin_1.png)  
+
+### 4.2.2 DefinePlugin
+어플리케이션은 개발환경과 운영환경으로 나눠서 운영되는데, 환경에 따라 API 서버 주소가 다를 수도 있다.  
+같은 소스 코드를 두 환경에 배포하기 위해서는 이러한 환경 의존적인 정보를 소스가 아닌 곳에서 관리하는 것이 좋다.  
+배포할 때마다 코드를 수정하는 것은 곤란하기 때문이다.  
+
+웹팩은 이러한 환경 정보를 제공하기 위해 DefinePlugin을 제공한다.
+##### webpack.config.js
+~~~
+const webpack = require('webpack');
+
+export default {
+  plugins: [
+    new webpack.DefinePlugin({}),
+  ]
+}
+~~~
+빈 객체를 전달해도 기본적으로 넣어주는 값이 있다. 노드 환경 정보인 process.env.NODE_ENV인데 웹팩 설정의 mode에 설정한 값이 여기에 들어간다.  
+'development'를 설정했기 때문 어플리케이션 코드에서 process.env.NODE_ENV 변수로 접근하면 'development' 값을 얻을 수 있다.
+
+##### app.js
+~~~
+console.log(process.env.NODE_ENV) // "development"
+~~~
+이 외에도 웹팩 컴파일 시간에 결정되는 값을 전역 상수 문자열로 어플리케이션에 주입할 수 있다.  
+~~~
+new webpack.DefinePlugin({
+  TWO: '1+1',
+})
+~~~
+TWO라는 전역 변수에 1+1 이란 코드 조각을 넣었다. 실제 어플리케이션 코드에서 이것을 출력해보면 2가 나올 것이다.  
+
+코드가 아닌 값을 입력하려면 문자열화한 뒤 넘기자.
+~~~
+new webpack.DefinePlugin({
+  VERSION: JSON.stringify('v.1.2.3'),
+  PRODUCTION: JSON.stringify(false),
+  MAX_COUNT: JSON.stringify(999),
+  'api.domain': JSON.stringify('http://dev.api.domain.com'),
+})
+~~~
+
+##### app.js
+~~~
+console.log(VERSION) // 'v.1.2.3'
+console.log(PRODUCTION) // false
+console.log(MAX_COUNT) // 999
+console.log(api.domain) // 'http://dev.api.domain.com'
+~~~
+빌드 타임에 결정된 값을 어플리이션에 전달할 때는 이 플러그인을 사용하자.
+
+### 4.2.3 HtmlTemplatePlugin
+HtmlTemplatePlugin은 HTML 파일을 후처리하는 데 사용한다. 빌드타임의 값을 넣거나 코드를 압축할 수 있다.  
+
+index.html 파일을 src/index.html로 옮긴 뒤, 다음과 같이 작성해 보자.
+##### src/index.html
+~~~
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>타이틀<%= env %></title>
+  </head>
+  <body>
+    <!-- 로딩 스크립트 제거 -->
+    <!-- <script src="dist/main.js"></script> -->
+  </body>
+</html>
+~~~
+ 
+타이틀 부분에 EJS 문법을 사용하여 전달받은 env 변수 값을 출력한다.  
+HtmlTemplatePlugin은 이 변수에 데이터를 주입시켜 동적으로 HTML 코드를 생성한다.  
+뿐만 아니라 웹팩으로 빌드한 결과물을 자동으로 로딩하는 코드를 주입해 준다.  
+따라서 로딩 스크립트 코드는 제거해도 무방하다.  
+
+##### webpack.config.js
+~~~
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports {
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html', // 템플릿 경로를 지정 
+      templateParameters: { // 템플리셍 주입할 파라매터 변수 지정
+        env: process.env.NODE_ENV === 'development' ? '(개발용)' : '', 
+      },
+    })
+  ]
+}
+~~~
+
+##### 그밖의 설정
+개발 환경과 달리 운영 환경에서는 파일을 압축하고 불필요한 주석을 제거하는 것이 좋다
+##### webpack.config.js
+~~~
+new HtmlWebpackPlugin({
+  minify: process.env.NODE_ENV === 'production' ? { 
+    collapseWhitespace: true, // 빈칸 제거 
+    removeComments: true, // 주석 제거 
+  } : false,
+}
+~~~
+환경 변수에 따라 minify 옵션을 켰다.
