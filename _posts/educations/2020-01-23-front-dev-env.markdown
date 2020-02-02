@@ -501,6 +501,114 @@ module.exports {
 ### 5.3.1 플로그인 사용하기  
 기본적으로 ECMASCript2015로 작성한 코드를 인터넷 익스플로러에서 돌리기 위해, `block-scoping` 플러그인을 사용한다.  
 ( const, let처럼 블록 스코핑을 따르는 예약어를 함수 스코핑을 사용하는 var로 변경한다. )  
+
+NPM 패키지로 제공하는 플러그인을 설치
+~~~
+❯ npm install -D @babel/plugin-transform-block-scoping
+~~~
+설치한 플러그인을 사용 시
+~~~
+// app.js
+const alert = msg => window.alert(msg);
+~~~
+~~~
+❯ npx babel app.js --plugins @babel/plugin-transform-block-scoping
+
+var alert = msg => window.alert(msg);
+~~~
+
+또한 인터넷 익스플로러는 화살표 함수도 지원하지 않는데, `arrow-functions` 플러그인을 사용해서 일반 함수로 변경할 수 있다.
+~~~
+❯ npm install -D @babel/plugin-transform-arrow-functions
+
+npx babel app.js \
+  --plugins @babel/plugin-transform-block-scoping \
+  --plugins @babel/plugin-transform-arrow-functions
   
+var alert = function (msg) {
+  return window.alert(msg);
+};
+~~~
 
+ECMAScript5에서부터 지원하는 엄격 모드를 사용하는 것이 안전하기 때문에, `strict-mode 플러그인`을 사용하여 "use strict" 구문을 추가하자.  
+그전에 커맨드라인 명령어가 점점 길어지기 떄문에 설정 파일로 분리하는 것이 낫다.  
+웹팩이 webpack.config.js를 기본 설정파일로 사용하듯, 바벨도 babel.config.js를 사용한다.  
 
+프로젝트 루트에 babel.config.js 파일을 아래와 같이 작성하자.
+##### babel.config.js
+~~~
+module.exports = {
+	 plugins: [
+		"@babel/plugin-transform-block-scoping",
+		"@babel/plugin-transform-arrow-functions",
+		"@babel/plugin-transform-strict-mode", 
+	]
+}
+~~~
+커맨드라인에서 사용한 block-scoping, arrow-functions 플러그인을 설정 파일로 옮겨 plugins 배열에 추가하는 방식이다.  
+~~~
+❯ npx babel app.js
+~~~
+비로소 인터넷 익스폴로러에서 안전하게 동작하는 코드로 트랜스파일되었다.
+
+### 5.4 프리셋
+ECMAScript2015+으로 코딩할 때 필요한 플러그인을 일일이 설정하는 일은 번거로운 일이다.  
+따라서 목적에 맞게 여러가지 플러그인을 세트로 모아놓은 것을 "프리셋"이라 한다.  
+### 5.4.1 프리셋 사용하기  
+바벨은 목적에 따라 몇 가지 프리셋을 제공한다.  
++ preset-env
+	- ECMAScript2015+를 변환할 때 사용
++ preset-flow
++ preset-react
++ preset-typescript  
+
+인터넷 익스플로러 지원을 위해 env 프리셋을 사용해 보자. 
+~~~
+❯ npm install -D @babel/preset-env
+~~~
+##### babel.config.js
+~~~
+module.exports = {
+  presets: [
+    '@babel/preset-env'
+  ]
+}
+// 위에서 사용한 플러그인(3개)를 위의 설정으로 대체할 수 있다.
+~~~
+
+### 5.4.2 타깃 브라우저
+우리 코드가 크롬 최신 버전(2019년 12월 기준)만 지원한다면, 인터넷 익스플로러를 위한 코드 변환은 불필요하다.  
+target 옵션에 브라우 버전명만 지정하면, env 프리셋은 이에 맞는 플러그인들을 찾아 최적의 코드를 출력한다.  
+##### babel.config.js 
+~~~java
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        targets: {
+          chrome: '79', // 크롬 79까지 지원하는 코드를 만든다
+        }
+      }
+    ]
+  ]
+}
+~~~
+크롬은 블록 스코핑과 화살표 함수를 지원하기 때문에 코드를 변환하지 않고 이러한 결과물을 만들었다.  
+만약 인터넷 익스플로러도 지원해야 한다면, 바벨 설정에 브라우저 정보만 하나 더 추가하면 된다.  
+##### babel.config.js 
+~~~
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        targets: {
+          chrome: '79',
+          ie: '11' // ie 11까지 지원하는 코드를 만든다
+        }
+      }
+    ]
+  ]
+}
+~~~

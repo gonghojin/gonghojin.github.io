@@ -27,7 +27,7 @@ cover:  "/assets/instacode.png"
 + Mediator
 	- Colleague 객체와 교류하는 데 필요한 인터페이스를 정의
 + ConcreteMediator
-	- Colleague 객체와 조화를 이뤄서 협력 행동을 구현히며, 참조할 Colleague 객체를 파악하고 관리
+	- Colleague 객체와 조화를 이뤄서 협력 행동을 구현하며, 참조할 Colleague 객체를 파악하고 관리
 + Colleague 클래스들
 	- 자신의 중재자 객체가 무엇인지 파악한다.  
 		다른 객체와 협력이 필요하면 그 중재자를 통해 협력할 수 있도록 하는 역할
@@ -201,5 +201,4 @@ class MediatorDemo extends JFrame implements ActionListener {
 - 참조
 	+ [Gof의 디자인 패턴](https://www.google.com/search?newwindow=1&sxsrf=ACYBGNTM3TLPpNtM8XVERiP7AyPyLDi3sQ%3A1572758465286&ei=wWO-XfOOEcTGmAWs26i4Cw&q=gof%EC%9D%98+%EB%94%94%EC%9E%90%EC%9D%B8%ED%8C%A8%ED%84%B4&oq=gof&gs_l=psy-ab.1.1.35i39l2j0i67j0j0i131l4j0j0i131.1801221.1802149..1803884...0.1..0.188.465.0j3......0....1..gws-wiz.......0i71.wMtI5vf-WEU)	
 	+ <https://ko.wikipedia.org/wiki/%EC%A4%91%EC%9E%AC%EC%9E%90_%ED%8C%A8%ED%84%B4>
-	+ <https://online.visual-paradigm.com/diagrams/templates/class-diagram/gof-design-patterns-mediator/>
 
