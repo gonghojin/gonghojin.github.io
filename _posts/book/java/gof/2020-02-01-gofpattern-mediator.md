@@ -48,3 +48,158 @@ cover:  "/assets/instacode.png"
 4. 객체 간의 협력 방법을 추상화한다.  
 	- 객체 사이의 중재를 독립적인 개념으로 만들고 이것을 캡슘화함으로써, 사용자는 각 객체의 행동과 상관없이 객체 간 연결 방법에만 집중할 수 있다.  
 	
+### 예제 코드
+~~~java
+// Colleague interface
+interface Command {
+	void execute();
+}
+
+// Abstract Mediator
+interface Mediator {
+    void book();
+    void view();
+    void search();
+    void registerView(BtnView v);
+    void registerSearch(BtnSearch s);
+    void registerBook(BtnBook b);
+    void registerDisplay(LblDisplay d);
+}
+
+// Concrete mediator
+class ParticipantMediator implements Mediator {
+	BtnVAIEW btnView;
+	BtnSearch btnSearch;
+	BtnBook btnBook;
+	LblDisplay lblDisplay;
+	
+	public void registerView(BtnView btnView) {
+		this.btnView = btnView;
+	}
+	
+	public void registerSearch(BtnSearch btnSearch) {
+		this.btnSearch = btnSearch;
+	}
+	
+	public void registerBook(BtnBook btnBook) {
+		this.btnBook = btnBook;
+	}
+	
+	public void registerDisplay(LblDisplay lblDisplay) {
+		this.lblDisplay = lblDisplay;
+	}
+	
+	public void book() {
+		btnBook.setEnabled(false);
+		btnView.setEnabled(true);
+		btnSearch.setEnabled(true);
+		show.setText("booking...");
+	}
+	
+	public void view() {
+		btnView.setEnabled(false);
+		btnSearch.setEnabled(true);
+		btnBook.setEnabled(true);
+		show.setText("viewing...");
+	}
+	
+	public void search() {
+		btnSearch.setEnabled(false);
+		btnView.setEnabled(true);
+		btnBook.setEnabled(true);
+		show.setText("searching...");
+	}
+}
+
+// A concrete colleague
+class BtnView extends JButton implements Command {
+	Mediator mediator;
+	
+	BtnView(ActionListener actionListener, Mediator mediator) {
+		super("View");
+		addActionListener(actionListener);
+		this.mediator = mediator;
+		mediator.registerView(this);
+	}
+	
+	public void execute() {
+		mediator.view();
+	}
+}
+
+// A concrete colleague
+class BtnSearch extends JButton implements Command {
+	Mediator mediator;
+	
+	BtnSearch(ActionListener actionListener, Mediator mediator) {
+		super("Search");
+		addActionListener(actionListener);
+		this.mediator = mediator;
+		mediator.registerSearch(this);
+	}
+	
+	public void execute() {
+		mediator.search();
+	}
+}
+
+// A concrete colleague
+class BtnBook extends JButton implements Command {
+	Mediator mediator;
+	
+	BtnBook(ActionListener actionListener, Mediator mediator) {
+		super("Book");
+		addActionListener(actionListener);
+		this.mediator = mediator;
+		mediator.registerBook(this);
+	}
+	
+	public void execute() {
+		mediator.book();
+	}
+}
+
+// A concrete colleague
+class LblDisplay  extends JLabel {
+	Mediator mediator;
+	
+	LblDisplay(Mediator mediator) {
+		super("Just start...");
+		this.mediator = mediator;
+		mediator.registerDisplay(this);
+		setFont(new Font("Arial", Font.BOLD, 24));
+	}
+}
+
+class MediatorDemo extends JFrame implements ActionListener {
+	Mediator med = new ParticipantMediator();
+  
+	MediatorDemo() {
+		JPanel p = new JPanel();
+		p.add(new BtnView(this, med));
+		p.add(new BtnBook(this, med));
+		p.add(new BtnSearch(this, med));
+		getContentPane().add(new LblDisplay(med), "North");
+		getContentPane().add(p, "South");
+		setSize(400, 200);
+		setVisible(true);
+	}
+
+	public void actionPerformed(ActionEvent actionEvent) {
+		Command comd = (Command) actionEvent.getSource();
+		comd.execute();
+	}
+
+	public static void main(String[] args) {
+		new MediatorDemo();
+	}
+}
+
+~~~
+
+---
+- 참조
+	+ [Gof의 디자인 패턴](https://www.google.com/search?newwindow=1&sxsrf=ACYBGNTM3TLPpNtM8XVERiP7AyPyLDi3sQ%3A1572758465286&ei=wWO-XfOOEcTGmAWs26i4Cw&q=gof%EC%9D%98+%EB%94%94%EC%9E%90%EC%9D%B8%ED%8C%A8%ED%84%B4&oq=gof&gs_l=psy-ab.1.1.35i39l2j0i67j0j0i131l4j0j0i131.1801221.1802149..1803884...0.1..0.188.465.0j3......0....1..gws-wiz.......0i71.wMtI5vf-WEU)	
+	+ <https://ko.wikipedia.org/wiki/%EC%A4%91%EC%9E%AC%EC%9E%90_%ED%8C%A8%ED%84%B4>
+	+ <https://online.visual-paradigm.com/diagrams/templates/class-diagram/gof-design-patterns-mediator/>
+
