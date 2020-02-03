@@ -197,6 +197,12 @@ class MediatorDemo extends JFrame implements ActionListener {
 
 ~~~
 
+### 관련 패턴
+퍼사드(Facade) 패턴은 객체들로 구성된 서브시스템을 추상화하여 좀더 편한 인터페이스를 제공하려는 것으로 중재자 패턴과는 좀 다르다.  
+Facade 객체는 서브시스템을 구성하는 객체로만 메세지가 전달되고, 그 반대로는 메세지가 처리가 되지 않는다.(서브시스템을 구성하는 객체가 퍼사드 객체에 메시지 전달 X)  
+그러나 중재자 객체는 양방향이다.  
+상화 관련된 객체들은 `감시자 패턴(Observer)`을 사용해서 중재자 객체들과 교류한다. 
+
 ---
 - 참조
 	+ [Gof의 디자인 패턴](https://www.google.com/search?newwindow=1&sxsrf=ACYBGNTM3TLPpNtM8XVERiP7AyPyLDi3sQ%3A1572758465286&ei=wWO-XfOOEcTGmAWs26i4Cw&q=gof%EC%9D%98+%EB%94%94%EC%9E%90%EC%9D%B8%ED%8C%A8%ED%84%B4&oq=gof&gs_l=psy-ab.1.1.35i39l2j0i67j0j0i131l4j0j0i131.1801221.1802149..1803884...0.1..0.188.465.0j3......0....1..gws-wiz.......0i71.wMtI5vf-WEU)	
