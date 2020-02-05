@@ -26,3 +26,59 @@ Originator은 현재 상태를 알려주는 정보로 메멘토를 초기화한�
 ### 구조
 ![alt](/assets/gof/images/gof-design-patterns-memento.png)
 
++ Memento
+	- Originator 객체의 내부 상태를 필요한 만큼 저장해 둔다. 메멘토는 Originator 객체를 제외한 다른 객체는 자신에게 접근할 수 없도록 막는다.    
+	그래서 Memento 클래스에는 사실상 두 종류의 인터페이스가 있다.  
+		- Caretaker 클래스는 제한 범위 인터페이스만을 볼 수 있다.
+		- Originator 클래스는 광범위 인터페이스가 보인다. 즉 모든 자료에 접근 가능하다.  
+- Originator
+	- 원조본 객체이다. 메멘토를 생성하여 현재 객체의 상태를 저장하고 메멘토를 사용하여 내부 상태를 복원한다.  
+- Caretaker
+	- 메멘토의 보관을 책임지는 보관자이다. 메멘토의 내용을 검사하거나 건드리지는 않는다.  
+
+### 협력 방법
++ Caretaker(보관자) 객체는 Originator 객체에 메멘토 객체를 요청한다. 또 요청한 시간을 저장하며, 받은 메멘토 객체를 다시 Originator 객체에게 돌려준다.  
+	하지만 Originator 객체가 이전 상태로 돌아갈 필요가 없을 때는, 메멘토 객체를 Originator 객체에 전달하지 않아도 된다.  
++ 메멘토 객체는 수동적이다. 메멘토 객체를 생성한 Originator 객체만이 상태를 설정하고 읽어올 수 있다.  
+
+### 결과
+1. 캡슐화된 경계를 유지할 수 있다.
+	- Originator 객체만 메멘토를 다룰 수 있기 때문에 메멘토가 외부에 노출되지 않는다.  
+	이 패턴은 복잡한 Originator 클래스의 내부 상태를 다른 객체로 분리하는 방법으로 상태에 대한 정보의 캡슐화를 보장  
+2. Originator 클래스를 단순화할 수 있다.  
+3. 메멘토의 사용으로 더 많은 비용이 들어갈 수도 있다.  
+-	Originator 클래스가 많은 양의 정보를 저장해야 할 때나, 자주 메멘토를 반환해야 할 떄
+
+### 예제 코드
+~~~java
+// Originator
+class Originator {
+	// memento에 저장되는 상태값
+	private String state;
+	
+	public void setState(String state) {
+		this.state = state;
+	}
+	
+	public Memento saveToMemento() {
+		return new Memento(this.state);
+	}
+	
+	public void restoreFromMemento(Memento memento) {
+		this.state = memento.getSavedState();
+	}
+	
+	public static class Memento {
+		private final String state;
+		
+		public Memento(String stateToSave) {
+			this.state = stateToSave;
+		}
+		
+		// 외부 클래스에서만 접근 가능
+		private String getSavedState() {
+			return state;
+		}
+	}
+}
+~~~
