@@ -58,9 +58,11 @@ class Originator {
 	
 	public void setState(String state) {
 		this.state = state;
+		System.out.println("Originator: Setting state to " + state);
 	}
 	
 	public Memento saveToMemento() {
+		System.out.println("Originator: Saving to Memento.");
 		return new Memento(this.state);
 	}
 	
@@ -81,4 +83,43 @@ class Originator {
 		}
 	}
 }
+
+// Caretaker
+class Caretaker {
+	public static void main(String[] args) {
+			List<Originator.Memento> savedStates = new ArrayList<Originator.Memento>();
+			
+			Originator originator = new Originator();
+			originator.set("State1");
+			originator.set("State2");
+			savedStates.add(originator.saveToMemento());
+			originator.set("State3");
+			savedStates.add(originator.saveToMemento());
+			originator.set("State4");
+			
+			originator.restoreFromMemento(savedStates.get(1));   
+	}
+}
+/*
+ 출력 결과
+ Originator: Setting state to State1
+ Originator: Setting state to State2
+ Originator: Saving to Memento.
+ Originator: Setting state to State3
+ Originator: Saving to Memento.
+ Originator: Setting state to State4
+ Originator: State after restoring from Memento: State3
+*/
+
 ~~~
+
+### 관련 패턴
+Command(명령) 패턴은 실행 취소가 가능한 연산의 상태를 저장할 때, 메멘토 패턴을 사용할 수 있다.  
+메멘토 패턴은 반복자 패턴에서의 반복 과정 상태를 관리할 수 있다.
+
+---
+- 참조
+	+ [Gof의 디자인 패턴](https://www.google.com/search?newwindow=1&sxsrf=ACYBGNTM3TLPpNtM8XVERiP7AyPyLDi3sQ%3A1572758465286&ei=wWO-XfOOEcTGmAWs26i4Cw&q=gof%EC%9D%98+%EB%94%94%EC%9E%90%EC%9D%B8%ED%8C%A8%ED%84%B4&oq=gof&gs_l=psy-ab.1.1.35i39l2j0i67j0j0i131l4j0j0i131.1801221.1802149..1803884...0.1..0.188.465.0j3......0....1..gws-wiz.......0i71.wMtI5vf-WEU)	
+	+ <https://online.visual-paradigm.com/diagrams/templates/class-diagram/gof-design-patterns-memento/>
+	+ <https://ko.wikipedia.org/wiki/%EB%A9%94%EB%A9%98%ED%86%A0_%ED%8C%A8%ED%84%B4>
+
