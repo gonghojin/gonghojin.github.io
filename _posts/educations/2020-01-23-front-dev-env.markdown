@@ -8,7 +8,7 @@ categories: Seminar
 tags:	 Front Environment NPM Babel Webpack
 cover:  "/assets/instacode.png"
 ---
-# 프론트엔드 개발 환경의 이해
+# 프론트엔드 개발 환경의 이해 1(NPM, 웹팩, Babel)
 ## 개발환경을 구성하는데 필요한 도구
 + Node.js
 	- 프로젝트 전반에 사용되는 `자바스크립트` 기반 플랫폼
@@ -580,7 +580,7 @@ module.exports = {
 우리 코드가 크롬 최신 버전(2019년 12월 기준)만 지원한다면, 인터넷 익스플로러를 위한 코드 변환은 불필요하다.  
 target 옵션에 브라우 버전명만 지정하면, env 프리셋은 이에 맞는 플러그인들을 찾아 최적의 코드를 출력한다.  
 ##### babel.config.js 
-~~~java
+~~~
 module.exports = {
   presets: [
     [
@@ -612,3 +612,79 @@ module.exports = {
   ]
 }
 ~~~
+
+### 5.4.2 폴리필
+바벨은 ECMAScript2015+를 ECMAScript5 버전으로 변환할 수 있는 것만 빌드한다.  
+그렇지 못한 것들은 `폴리필`이 라고 부르는 코드 조각을 추가해서 해결해야 한다.  
+
+예를들면, ECMAScript2015의 블록 스코핑은 ECMASCript5의 함수 스코핑으로 대체할 수 있다. 화살표 함수도 일반 함수로 대체할 수 있다.  
+이런 것들은 바벨이 변환해서 ECMAScript5 버전으로 결과물을 만들기 때문이다.  
+하지만 Promise는 ECMAScript5 버전으로 대체할 수 없다. 다만 ECMAScript5 버전으로 구현할 수는 있다.  
+
+env 프리셋은 폴리필을 지정할 수 있는 옵션을 제공한다.
+##### babel.config.js
+~~~
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        useBuiltIns: 'usage', // 폴리필 사용 방식 지정
+        corejs: { // 폴리필 버전 지정
+          version: 2
+        }
+      },
+    ],
+  ],
+};
+~~~
++ useBuiltIns
+	- 어떤 방식으로 폴리필을 사용할지 설정하는 옵션
+	- "usage", "entry", false(기본값) 세 가지 값을 사용
+		- usage나 entry 설정 시 폴리필 패키지 중 core-js를 모듈로 가져온다.  
+	
+core-js 패키지에서 Promise 모듈을 가져오는 임포트 구문이 상단에 추가되며, 인터넷 익스폴러에서도 안전하게 돌아간다.
+~~~
+npx babel src/app.js
+"use strict";
+
+require("core-js/modules/es6.promise");
+require("core-js/modules/es6.object.to-string");
+
+new Promise();
+~~~
+
+## 6. 웹팩으로 통합
+실무 환경에서는 바벨을 직접 사용하는 것보다는, 로더 형태로 제공되는 'babel-loader'를 통해 `웹팩으로 통합해서` 사용하는 것이 일반적이다. 
+먼저 패키지를 설치하고
+~~~
+❯ npm install -D babel-loader
+~~~ 
+웹팩 설정에 로더를 추가한다.  
+##### webpack.config.js
+~~~
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader', // 바벨 로더를 추가한다 
+      },
+    ]
+  },
+}
+~~~
+.js 확장자로 끝나는 파일은 babel-loader가 처리하도록 설정했다.  
+사용하는 써드파티 라이브러리가 많을수록 바벨 로더가 느리게 동작할 수 있기 때문에, node_modules 폴더를 로더가 처리하지 않도록 예외처리 했다.  
+
+폴리필 사용 설정을 했다면 core-js도 설치해야 한다. 웹팩은 바벨 로더가 만든 아래 코드를 만나면 core-js를 찾을 것이기 때문이다.  
+~~~
+require("core-js/modules/es6.promise");
+require("core-js/modules/es6.object.to-string");
+~~~
+버전 2로 패키지를 추가하자.
+~~~
+❯ npm i core-js@2
+~~~
+그리고 웹팩으로 빌드하면 끝~
