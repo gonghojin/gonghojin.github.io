@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title:  "프론트엔드 개발환경 이해(김정환님 세미나)"
+title:  "프론트엔드 개발환경 이해2(김정환님 세미나)"
 date:   2020-01-22 17:00:00
 author: Gongdel
 categories: Seminar
@@ -104,3 +104,147 @@ console.log("hello world");
 여전히 ESLint를 사용해야 하는 이유를 남아 있다. 포맷팅은 프리티어에 맡기더라도, 코드 품질과 관련된 검사는 ESLint의 몫이기 때문이다.  
 따라서 이 둘을 같이 사용하는 것이 최선이다. 프리티어는 이러한 ESLint와 통합 방법을 제공한다.  
 eslint-config-prettier 는 프리티어와 충돌하는 ESLint 규칙을 끄는 역할을 한다. 둘 다 사용하는 경우 규칙이 충돌하기 때문이다.
+패키지를 설치한 뒤,
+~~~
+❯ npm i -D eslint-config-prettier
+~~~
+##### eslintrc.js
+설정파일의 extends 배열에 추가한다.
+~~~
+module.exports = {
+    extends: [
+        "eslint:recommended", // 미리 설정된 규칙 세트을 사용한다
+        "eslint-config-prettier"
+    ],
+}
+~~~
++ eslint-config-prettier
+	- ESLint는 중복 세미콜론 사용을 검사하고, 프리티어도 마찬가지다.  
+	따라서 어느 한쪽에서는 규칙을 꺼야 하는데, eslint-config-prettier를 extends하면 중복되는 ESLint 규칙을 비활성화한다.  
+
+ESLint는 중복된 포매팅 규칙을 프리티어에게 맞기고, 나머지 코드 품질에 관한 검사만 한다.  
+따라서 아래처럼 두 개를 동시에 실행해서 코드를 검사한다.
+~~~
+❯ npx prettier app.js --write && npx eslint app.js --fix
+
+1:5  error  'foo' is assigned a value but never used  no-unused-vars
+
+✖ 1 problem (1 error, 0 warnings)
+~~~
+프리티어에 의해 코드가 아래와 같이 포매팅 되고, ESlint에 의해 코드 품질과 관련된 오류(no-unused-vars)를 리포팅한다.
+~~~
+var foo = '' // 사용하지 않은 변수. ESLint가 검사
+console.log();;;;;;; // 중복 세미콜론 사용. 프리티어가 자동 수정
+
+=============
+
+var foo = "";
+console.log();
+~~~
+
+한편, [eslint-plugin-prettier](https://github.com/prettier/eslint-plugin-prettier)는 프리티어 규칙을 ESLint 규칙으로 추가하는 플러그인이다.  
+프리티어의 모든 규칙이 ESLint로 들어오기 때문에 ESLint만 실행하면 된다.  
+
+패키지를 설치하고,
+~~~
+❯ npm i -D eslint-plugin-prettier
+~~~
+설정 파일에서 plugins와 rules에 설정을 추가한다.
+##### eslintrc.js
+~~~
+{
+  plugins: [
+    "prettier"
+  ],
+  rules: {
+    "prettier/prettier": "error"
+  },
+}
+~~~
+프리티어의 모든 규칙을 ESLint 규칙으로 가져온 설정이다. 이제는 ESLint만 실행해도 프리티어 포매팅 기능을 가져올 수 있다.  
+~~~
+❯ npx eslint app.js --fix
+~~~
+프리티어는 이 두 패키지를 함게 사용하는 [단순한 설정](https://prettier.io/docs/en/integrating-with-linters.html)을 제공하는데 아래 설정을 추가하면 된다.  
+##### eslintrc.js
+~~~
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended"
+  ]
+}
+~~~
+
+## 4. 자동화
+린트는 코딩할 때마다 수시로 실행해야 하기 때문에 이런 일은 자동화하는 것이 좋다.  
+"긱 훗"과 "에디터 확장 도구"를 사용하는 방법이 있다.
+
+## 4.1 긱 훗
+소스 트래킹 도구로 깃을 사용한다면 '깃 훅'을 사용하는 것이 좋다. 커밋 전, 푸시 전 등 깃 커맨드 실행 시점에 끼어들 수 있는 훅을 제공한다.  
+[husky](https://github.com/typicode/husky)는 깃 훅을 쉽게 사용할 수 있는 도구다. 커밋 메시지 작성 전에 끼어 들어 린트로 코드 검사 작업을 추가해 보자.  
+
+먼저 패키지를 다운로드 하고,
+~~~
+❯ npm i -D husky
+~~~
+허스키는 패키지 파일에 설정을 추가한다.
+##### package.json
+~~~
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "echo \"이것은 커밋전에 출력됨\""
+    }
+  }
+}
+~~~
+훅이 제대로 동작하는지 빈 커밋을 만들어 보자.
+~~~
+git commit --allow-empty -m "빈 커밋"
+husky > pre-commit (node v13.1.0)
+이것은 커밋전에 출력됨  ----> 깃 훅이 동작함 
+[master db8b4b8] empty
+~~~
+pre-commit에 설정한 내용이 출력되었다. 출력 대신에 린트 명령어로 대체하면 커밋 메시지 작성 전에 린트를 수행할 수 있다.  
+##### package.json
+~~~
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "eslint app.js --fix"
+    }
+  }
+}
+~~~
+만약 린트 수행 중 오류를 발견하면 커밋 과정은 취소된다.  린트를 통과하게끔 코드를 수정해야만 커밋할 수 있는 환경이 된 것이다.  
+
+추가적으로, 코드가 점점 많아지면 커밋 작성이 느려질 수 있는데, 커밋 전에 모든 코드를 린트로 검사하는 시간이 소유되기 때문이다.  
+커밋 시 변경된 파일만 린트로 검사해서 시간을 단축해 보자. [lint-staged](https://github.com/okonet/lint-staged)는 변경된(스테이징된) 파일만 린트를 수행하는 도구다.  
+
+패키지를 설치하고,
+~~~
+❯ npm i -D lint-staged
+~~~
+패키지 파일에 설정을 추가한다.
+##### package.json
+~~~
+{
+  "lint-staged": {
+    "*.js": "eslint --fix"
+  }
+}
+~~~
+내용이 변경된 파일 중에 .js 확장자로 끝나는 파일만 린트로 코드 검사를 한다.  
+pre-commit 훅도 아래처럼 변경한다.
+##### package.json
+~~~
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+}
+~~~
+커밋 메시지 작성 전에 lint-staged를 실행할 것이다. 변경되거나 추가된 파일만 검사함으로써, 커밋 과정이 훨씬 가벼워 질 것이다.
