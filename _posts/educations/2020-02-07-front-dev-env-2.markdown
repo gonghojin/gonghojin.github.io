@@ -379,3 +379,29 @@ curl localhost:8080/api/keywords
 
 mocks/api/keywords/GET.json 경로에 API 응답 파일을 만든다.  
 GET 메소드를 사용하기 때문에, GET.json으로 파일을 만들었다.(POST, PUT, DELETE도 지원)
+##### GET.json
+~~~
+[
+  { "keyword": "이탈리아" }, 
+  { "keyword": "세프의요리" }, 
+  { "keyword": "제철" }, 
+  { "keyword": "홈파티 " }
+]
+~~~
+기존에 설정한 목업 응답 컨트롤러를 제거하고 connect-api-mocker로 미들웨어를 대신한다.  
+~~~
+// webpack.config.js
+const apiMocker = require('connect-api-mocker')
+
+module.exports = {
+  devServer: {
+    before: (app, server, compiler) => {
+      app.use(apiMocker('/api', 'mocks/api'))
+    },
+  }
+}
+~~~
+Express 객체인 app는 get() 메소드뿐만 아니라 미들웨어 추가를 위한 범용 메서드 use()를 제공하는데, 이를 사용해 목업 미들웨어를 추가했다.  
+첫번째 인자는 설정할 라우팅 경로, 두번째 인자는 응답으로 제공할 목업 파일 경로로 방금 만든 mocks/api 경로를 전달  
+
+목업 API 개수가 많다면 직접 컨트롤러를 작성하는 것보다 목업 파일로 관리하는 것을 추천
