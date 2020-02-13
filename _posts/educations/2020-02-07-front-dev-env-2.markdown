@@ -405,3 +405,52 @@ Express 객체인 app는 get() 메소드뿐만 아니라 미들웨어 추가를 
 첫번째 인자는 설정할 라우팅 경로, 두번째 인자는 응답으로 제공할 목업 파일 경로로 방금 만든 mocks/api 경로를 전달  
 
 목업 API 개수가 많다면 직접 컨트롤러를 작성하는 것보다 목업 파일로 관리하는 것을 추천
+
+## 4.2.3 실제 API 연동: devServer.proxy
+localhost:8080에서 localhost:8081 호출할 경우, 즉 다른 서버로 호출할 경우 CORS(Cross Origin Resource Sharing) 정책에 위반된다.  
+CORS 브라우저와 서버간의 보안상의 정책인데 브라우저가 최초로 접속한 서버에서만 요청을 할 수 있다.  
+
+이 문제를 해결하는 방법은 두 가지인데, 그중 프론트엔드 측에서 해결하는 방법을 알아보자.  
+웹팩 개발 서버에서 api 서버로 `프록싱`하는 방법으로, 웹팩 개발 서버는 proxy 속성으로 이를 지원한다.
+#####
+~~~
+// webpack.config.js
+module.exports = {
+  devServer: {
+    proxy: {
+      '/api': 'http://localhost:8081', // 프록시
+    }
+  }
+}
+~~~
+개발 서버에 들어온 모든 http 요청 중 '/api'로 시작되는 것은 'http://localhost:8081'로 요청하는 설정이다.
+
+## 4.3. 최적화
+코드가 많아지면 번들링된 결과물도 커지기 마련이다. 거위 메가바이트 단위로 커질 수도 있는데 당연히 브라우저 성능에 영향을 준다. 파일을 다운로드 하는데 시간이 많이 걸리기 때문이다.  
+이번 섹션에서는 번들링한 결과물을 어떻게 최적화할 수 있는지 몇 가지 방법에 대해 알아본다.  
+
+### 4.3.1 production 모드
+웹팩에 내장되어 있는 최적화 방법 중 [mode](https://webpack.js.org/configuration/mode/) 값을 설정하는 방식이 가장 기본이다.  
+DefinePlugin을 사용 시, mode를 "development"로 설정하면 process.env.NODE_ENV 값이 "development"로 설정되어 어플리케이션에 전역변수로 주입되고, 반면 mode를 "production"으로 설정하면 process.env.NODE_ENV 값이 "production"으로 설정된다.  
+
+그럼 환경변수 NODE_ENV 값에 따라 모드를 설정하도록 웹팩 설정 코드를 다음과 같이 추가할 수 있다.  
+~~~
+// webpack.config.js:
+const mode = process.env.NODE_ENV || 'development'; // 기본값을 development로 설정
+
+module.exports = {
+  mode,
+}
+~~~ 
+빌드 시에 이를 운영 모드로 설정하여 실행하도록 npm 스크립트를 추가한다.
+##### package.json
+~~~
+{
+  "scripts": {
+    "start": "webpack-dev-server --progress",
+    "build": "NODE_ENV=production webpack --progress"
+  }
+}
+~~~
+start는 개발 서버를 구동하기 때문에 환경변수를 설정하지 않고 기본값 development를 사용할 것이다.  
+배포용으로 만들 build는 환경변수를 production으로 설정했고 웹팩 mode에 설정된다. 
