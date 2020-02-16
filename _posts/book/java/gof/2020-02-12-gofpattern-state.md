@@ -27,7 +27,97 @@ cover:  "/assets/instacode.png"
 	- Context의 각 상태별로 필요한 행동을 캡슐화하여 인터페이스로 정의
 + ConcreteState 서브클래스
 	- 각 서브클래스들은 Context의 상태에 따라 처리되어야 할 실제 행동을 구현한다.
+
+### 협력 방법
++ 상태에 따라 다른 요청을 받으면 Context 클래스는 현재의 ConcreteState 객체로 전달한다.  
+	이 ConcreteState 클래스의 객체는 State 클래스를 상속하는 서브클래스들 중 하나의 인스턴스이다.
++ Context 클래스는 실제 연산을 처리할 State 객체에 자신을 매개변수로 전달한다.  
+	이로써 State 객체는 Context 클래스에 정의된 정보에 접근할 수 있다.
++ Contxt 클래스는 사용자가 사용할 수 있는 기본 인터페이스를 제공한다.  
+	사용자는 상태 객체를 Context 객체와 연결시킨다. 즉, Context 클래스에 현재 상태를 정의한다.  
+	이렇게 Context 객체를 만들고 나면 사용자는 더는 State 객체를 직접 다루지 않고 Context 객체에 요청을 보내기만 하면 된다.
+
+### 결과
+상태 패턴을 사용했을 때 나타나는 효과는 다음과 같다.  
++ 상태에 따른 행동을 국소화하며, 서로 다른 상태에 대한 행동을 별도의 객체로 관리한다.
+	- 상태 패턴을 사용하면 임의의 한 상태에 관련된 모든 행동을 하나의 객체로 모을 수 있다.  
+	한 상태에 종속적인 코드를 State 클래스의 서브클래스에 모두 정의하였기 때문에 새로운 상태와 새로운 전이 규칙이 발견되면 새로운 서브 클래스만 정의하면 된다.  
++ 상태 전이를 명확하게 만듭니다.  
+	- 어떤 객체가 자신의 현재 상태를 오직 내부 데이터 값으만 정의하면, 상태 전이는 명확한 표현을 갖지 못한다.  
+	단지 이 상태 변수에 값을 할당하는 문장 정도밖에는 되지 않습니다. 반면에 각 상태별로 별도의 객체를 만드는 것은 상태 전이를 명확하게 해 주는 결과가 된다.
++ 상태 객체는 공유될 수 있다.
+
+~~~java
+interface StateLike {
+	void writeName(StateContxt contxt, String name);
+}
+
+
+class StateLowerCase implements StateLike {
+	@Override
+	public void writeName(final StateContext context, final String name) {
+		System.out.println(name.toLowerCase());
+		context.setState(new StateMultipleUpperCase());
+	}
+}
+
+class StateMultipleUpperCase implements Statelike {
+	private int count = 0;
+
+	@Override
+	public void writeName(final StateContext context, final String name) {
+		System.out.println(name.toUpperCase());
+		// 2번 사용 후 State 변
+		if(++count > 1) {
+			context.setState(new StateLowerCase());
+		}
+	}
+}
+
+class StateContext {
+	private StateLike stateLike;
+	StateContext() {
+		this.setStateLike(new StateLowerCase());
+	}
+	
+	void setStateLike(final StateLike newState) {
+		this.stateLike = newState;
+	}
+	
+	public void writeName(final String name) {
+		this.stateLike.writeName(this, name);
+	}
+}
+
+public class DemoOfClientState {
+	public static void main(String[] args) {
+		final StateContext sc = new StateContext();
+
+		sc.writeName("Monday");
+		sc.writeName("Tuesday");
+		sc.writeName("Wednesday");
+		sc.writeName("Thursday");
+		sc.writeName("Friday");
+		sc.writeName("Saturday");
+		sc.writeName("Sunday");
+	}
+}
 ~~~
+
+~~~
+결과>
+	monday
+	TUESDAY
+	WEDNESDAY
+	thursday
+	FRIDAY
+	SATURDAY
+	sunday
+~~~
+
+### 관련 패턴
+상태 객체의 공유 시점과 공유 방법을 정의하는 데에 플라이급 패턴을 사용한다.  
+상태 객체는 종종 하나만 존재할 때가 많은데, 이떄는 단일체이다.
 
 ---
 
