@@ -52,7 +52,7 @@ cover:  "/assets/instacode.png"
 	- 서브클래스에서 구현할 알고리즘의 복잡함과는 상관없이 모든 ConcreteStrategy 클래스는 Strategy 인터페이스를 공유한다.  
 	따라서 어떤 ConcreteStrategy 클래스는 이 인터페이스를 통해 들어온 모든 정보를 다 사용하지 않는데도 이 정보를 떠안아야 할 때가 있다.
 
-### 예제 코
+### 예제 코드
 ~~~java
 // Strategy Interface
 public interface DragonSlayingStrategy {
