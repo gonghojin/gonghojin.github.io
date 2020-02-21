@@ -21,6 +21,18 @@ cover:  "/assets/instacode.png"
 ### 핵심 정리
 메서드 참조는 람다의 간단명료한 대안이 될 수 있다. `메서드 참조 쪽이 짧고 명확하다면 메서드 참조를 쓰고, 그렇지 않을 때만 람다를 사용하라.`
 
+---
+
+예 | 메서드 참조 | 람다
+---- | ---- | ---- 
+정적 | Integer:parseInt| str -> Integer.parseInt(str)
+한정적 | Instant.now()::isAfter | Instant then = Instant.now(); t-> then.isAfter(t);
+비한정적 | String::toLowerCase | str -> str.toLowerCase()
+클래스 | TreeMap<K,V>::new | () -> new TreeMap<K,V>
+배열 | int[]::new | len -> new int[len]
+
+---
+
 ## 44. 표준 함수형 인터페이스를 사용하라.
 ### 핵심 정리
 이제 자바도 람다를 지원한다. 입력값과 반환값에 함수형 인터페이스 타입을 활용하자. `보통은 java.util.function 패키지의 표준 함수형 인터페이스를` 사용하는 것이 가장 좋은 선택이다.  
