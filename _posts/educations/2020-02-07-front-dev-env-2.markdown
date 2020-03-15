@@ -302,14 +302,14 @@ npm start 명령어로 실행하면 다음과 같이 서버가 구동되었다�
 ~~~
 module.exports = {
   devServer: {
-    contentBase: path.join(__dirname, "dist"), 
-    publicPath: "/", 
-    host: "dev.domain.com",
-    overlay: true,
-    port: 8081,
-    stats: "errors-only",
-    historyApiFallback: true,
-  }
+      contentBase: path.join(__dirname, "dist"), // 정적파일을 제공할 경로, 기본값은 웹팩 아웃풋이다.
+      publicPath: "/", // 브라우저를 통해 접근하는 경로, 기본값은 ‘/’이다.
+      host: "dev.domain.com",
+      overlay: true, // 빌드 시 에러나 경고를 부라우저 화면에 표시한다.
+      port: 8080, // 개발 서버 포트 번호를 설정, 기본값은 8080
+      starts: "error-only", // 메시지 수준을 정할 수 있다
+      historyApiFallback: true,
+    }
 }
 ~~~
 + contentBase
@@ -323,14 +323,14 @@ module.exports = {
 	- 빌드 시 에러나 경고를 부라우저 화면에 표시한다.  
 + port
 	- 개발 서버 포트 번호를 설정, 기본값은 8080
-+ stats
++ starts
 	- 메시지 수준을 정할 수 있다.
-		- none’, ‘errors-only’, ‘minimal’, ‘normal’, ‘verbose’ 로 메세지 수준을 조절한다.
+		- 'none’, ‘errors-only’, ‘minimal’, ‘normal’, ‘verbose’ 로 메세지 수준을 조절한다.
 + historyApiFallBack
 	- 히스토리 API를 사용하는 SPA 개발 시 설정한다.  
 	404가 발생하면 index.html로 리다이렉트한다.  
 	
-이 외에도 개발 서버를 실행할 때 명령어 인자로 --progress를 추가하면 빌드 진행융을 보여준다.  
+이 외에도 개발 서버를 실행할 때 명령어 인자로 --progress를 추가하면 빌드 진행률을 보여준다.  
 빌드 시간이 길어질 경우 사용하면 좋다.  
 그밖의 옵션은 [여기](https://webpack.js.org/configuration/dev-server/)를 참조하자
 

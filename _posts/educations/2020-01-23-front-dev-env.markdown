@@ -213,7 +213,7 @@ module.exports = {
   module: {
     rules: [{
       test: /\.css$/, // .css 확장자로 끝나는 모든 파일 
-      use: ['css-loader'], // css-loader를 적용한다, 경로대신 배열에 문자열로 전달해도 가 
+      use: ['css-loader'], // css-loader를 적용한다, 경로대신 배열에 문자열로 전달해도 가능
     }]
   }
 }
@@ -276,7 +276,7 @@ module.exports = {
 ![https://webpack.js.org/](/assets/educations/images/file_loader_1.png)  
 
 하지만 이대로 index.html 파일을 브라우저에 로딩하면 이미지를 제대로 로딩하지 못한다.  
-CSS를 로딩하면 background-image: url(bg.png) 코드에 의해 동일 폴더에서 이미지를 찾으려고 시도하지만, 웹팩으로 빌드한 이미지 파일은 output인 dist 폴더 아래로 이동했기 때문이.  
+CSS를 로딩하면 background-image: url(bg.png) 코드에 의해 동일 폴더에서 이미지를 찾으려고 시도하지만, 웹팩으로 빌드한 이미지 파일은 output인 dist 폴더 아래로 이동했기 때문이입니다.
 따라서 file-loader 옵션을 조정해서 경로를 잡아주어야 한다.
 
 ##### webpack.config.js
@@ -578,7 +578,7 @@ module.exports = {
 
 ### 5.4.2 타깃 브라우저
 우리 코드가 크롬 최신 버전(2019년 12월 기준)만 지원한다면, 인터넷 익스플로러를 위한 코드 변환은 불필요하다.  
-target 옵션에 브라우 버전명만 지정하면, env 프리셋은 이에 맞는 플러그인들을 찾아 최적의 코드를 출력한다.  
+target 옵션에 브라우저 버전명만 지정하면, env 프리셋은 이에 맞는 플러그인들을 찾아 최적의 코드를 출력한다.  
 ##### babel.config.js 
 ~~~
 module.exports = {
