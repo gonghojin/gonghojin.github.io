@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title:  "프론트엔드 개발환경 이해2(김정환님 세미나)"
+title:  "프론트엔드 개발환경 이해2"
 date:   2020-01-22 17:00:00
 author: Gongdel
 categories: Seminar

@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title:  "프론트엔드 개발환경 이해(김정환님 세미나)"
+title:  "프론트엔드 개발환경 이해1"
 date:   2020-01-22 17:00:00
 author: Gongdel
 categories: Seminar
@@ -471,6 +471,72 @@ module.exports {
       },
     })
   ]
+}
+~~~
+
+### 4.2.4 CleanWebpackPlugin
+CleanWebpackPlugin은  `빌드 이전 결과물`을 제거하는 플러그인이다.  
+빌드 결과물은 아웃풋 경로에 모이는데, 과거 파일이 남아 있을 수 있다. 
+- 덮여 씌여지는 빌드 내용은 상관없지만, 그렇지 않은 결과물은 불필요하게 남아 있게 된다.  
+
+사용을 위해선 먼저 패키지를 설치한다.
+~~~
+❯ npm install -D clean-webpack-plugin
+~~~
+
+그후 웹팩에 설정을 추가한다.
+~~~
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    new CleanWebpackPlugin(),
+  ]
+}
+~~~
+
+### 4.2.5 MiniCssExtractPlugin
+스타일시트가 점점 많아지면 하나의 자바스크립트 결과물로 만드는 것은 부담일 수 있다. 이때 번들 결과에서 스타일시트 코드만 추출해서 별도의 CSS 파일로 만들어 역할에 따라 파일을 분리하는 것이 좋다.  
+브라우저에선 큰 파일 하나를 내려 받는 것보다, 여러 개의 작은 파일을 동시에 다운로드하는 것이 더 빠르다.
+
+개발 환경에서는 CSS를 하나의 모듈로 처리해도 상관없지만, 프로덕션 환경에서는 분리하는 것이 효과적이다.   
+이런한 역할을 `MiniCssExtractPlugin`이 해준다. CSS 별로 파일로 뽑아내 보자.  
+
+먼저 패키지를 설치한다.  
+~~~
+❯ npm install -D mini-css-extract-plugin
+~~~
+
+그후 웹팩에 설정을 추가한다.
+~~~
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  plugins: [
+    ...(
+      process.env.NODE_ENV === 'production' 
+      ? [ new MiniCssExtractPlugin({filename: `[name].css`}) ] // 프로덕션 환경에서만 추가
+      : []
+    ),
+  ],
+}
+~~~
+프로덕션 환경일 경우에만 플러그인을 추가했기 때문에, filename에 설정한 값으로 아웃풋 경로에 CSS 파일이 생성된다.  
+
+개발 환경에서는 css-loader에 의해 자바스크립트 모듈로 변경된 스타일시트를 적용하기 위해 `style-loader`를 사용했다.  
+반면 프로덕션 환경에서는 별도의 CSS 파일로 추출하는 플러그인을 적용했으므로 다른 로더가 필요하다.
+~~~
+module.exports = {
+  module: {
+    rules: [{
+      test: /\.css$/,
+      use: [
+        process.env.NODE_ENV === 'production' 
+        ? MiniCssExtractPlugin.loader  // 프로덕션 환경
+        : 'style-loader', 'css-loader' // 개발 환경
+      ],
+    }]
+  }
 }
 ~~~
 
