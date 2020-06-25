@@ -2,7 +2,7 @@
 layout: post
 comments: true
 title:  "프론트엔드 개발환경 이해2"
-date:   2020-01-22 17:00:00
+date:   2020-05-28 17:00:00
 author: Gongdel
 categories: Seminar
 tags:	 Front Environment NPM Babel Webpack
@@ -37,16 +37,29 @@ ESLint는 검사 규칙을 미리 정해 놓았다. [규칙 목록](https://esli
 ##### .eslintrc.js
 ~~~
 module.exports = {
-  rules: {
-    "no-unexpected-multiline": "error"
-  }
-}
+    "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "rules": {
+        "no-extra-semi": "error", // 연속 세미콜론 제거
+    }
+};
 ~~~
 규칙에 설정하는 값은 세 가지이다.  
 + off 또는 0 - 끔
 + warn 또는 1 - 경고
 + error 또는 2 - 오류
 
+사용법  
+규칙을 위반 코드 위치와 규칙명을 제공
+~~~
+❯ npx eslint app.js
+~~~
+규칙을 위반한 코드를 자동으로 수정
+~~~
+❯ npx eslint app.js --fix
+~~~
 ### 1.2.1 Extensible Config
 추천하는 규칙을 여러 개 미리 정해 놓은 것이 eslint:recommended 설정이다. [규칙 목록](https://eslint.org/docs/rules/)에서 왼쪽에 체크 표시되어 있는 것이 이 설정에서 활성화되어 있는 규칙이다.  
 

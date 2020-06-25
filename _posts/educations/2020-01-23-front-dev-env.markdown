@@ -2,7 +2,7 @@
 layout: post
 comments: true
 title:  "프론트엔드 개발환경 이해1"
-date:   2020-01-22 17:00:00
+date:   2020-05-21 17:00:00
 author: Gongdel
 categories: Seminar
 tags:	 Front Environment NPM Babel Webpack
@@ -178,7 +178,9 @@ module.exports = {
 모든 옵션을 웹팩 설정 파일로 옮겼기 때문에 단순히 webpack 명령어만 실행한다. 이제부터는 npm run build로 웹팩 작업을 지시할 수 있다.
 
 ---
-
+* LAB 1 - 웹팩 엔트리 / 아웃풋 실습:   
+ <https://github.com/gonghojin/lecture-frontend-dev-env/tree/1-webpack/1-entry>
+ 
 ### 3. 로더
 #### 3.1 로더의 역할
 웹팩은 자바스크립트로 만든 모듈뿐만 아니라, 스타일시트, 이미지, 폰트 등 `모든 파일을 모듈로 바라본다.`  
@@ -328,6 +330,9 @@ module.exports = {
 		+ 만약 이보다 크면 file-loader가 처리하는데 옵션 중 'fallback' 기본 값이 file-loader이기 때문  
 
 아이콘처럼 `용량이 작거나 사용 빈도가 높은 이미지는` 파일을 그대로 사용하기 보다는 Data URI Scheme를 적용하기 위해 url-loader를 사용하면 좋다!!
+
+* LAB 2 - 웹팩 로더:   
+<https://github.com/jeonghwan-kim/lecture-frontend-dev-env/tree/1-webpack/2-loader>
 
 ### 4. 플러그인
 ### 4.1 플러그인의 역할
