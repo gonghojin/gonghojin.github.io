@@ -9,6 +9,10 @@ tags:	 Front Environment NPM Babel Webpack
 cover:  "/assets/instacode.png"
 ---
 # 프론트엔드 개발 환경의 이해 1(NPM, 웹팩, Babel)
+## 사전 셋팅
+1. 실습 베이스 소스 Fork하기
+    - https://github.com/gonghojin/lecture-frontend-dev-env
+    
 ## 개발환경을 구성하는데 필요한 도구
 + Node.js
 	- 프로젝트 전반에 사용되는 `자바스크립트` 기반 플랫폼
