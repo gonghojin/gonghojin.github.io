@@ -348,78 +348,7 @@ module.exports = {
 그밖의 옵션은 [여기](https://webpack.js.org/configuration/dev-server/)를 참조하자
 
 ## 4.2. API 연동
-프론트엔드에서는 서버와 데이터를 주고 받기 위해 ajax를 사용한다.  
-보통은 api 서버를 어딘가에 띄우고(혹은 로컬 호스트에 띄우고) 프론트 서버와 함께 개발한다. 개발 환경에서 이러한 api 서버 구성을 어떻게 하는지 알아보자.  
-
-## 4.2.1. 목업 API 1: devServer.before
-웹팩 개발 서버 설정 중 'before' 속성은 미들웨어 추가 옵션으로, 웹팩 서버에 기능을 추가할 수 있게 해준다.  
-아래 소스를 보면
-##### webpack.config.js
-~~~
-module.exports = {
-  devServer: {
-    before: (app, server, compiler) => {
-      app.get('/api/keywords', (req, res) => {
-        res.json([
-          { keyword: '이탈리아' },
-          { keyword: '세프의요리' }, 
-          { keyword: '제철' }, 
-          { keyword: '홈파티'}
-        ])
-      })
-    }
-  }
-}
-~~~
-before에 설정한 미들웨어는 익스프레스에 의해서 app 객체가 인자로 전달되는데, 이는 Express 인스턴스다.  
-이 객체에 라우트 컨트롤러를 추가할 수 있는데 app.get(url, controller) 형태로 함수를 작성한다.  
-
-웹팩 개발 서느는 GET /api/keywords 요청 시 4 개의 엔트리를 담은 배열을 반환할 것이다. 서버를 다시 구동하고 curl로 http 요청을 보내면 아래와 같은 결과 값을 받는다.
-~~~
-curl localhost:8080/api/keywords
-[{"keyword":"이탈리아"},{"keyword":"세프의요리"},{"keyword":"제철"},{"keyword":"홈파티"}]
-~~~
-이러한 기능이 필요한 이유는 개발 초기 서버 api가 만들어지기 전, 서버 api 응답을 프론트엔드에서 추가할 때 사용할 수 있다.
-
-## 4.2.2. 목업 API 2: connect-api-mocker
-목업 api 작업이 많을 때는 [connect-api-mocker](https://github.com/muratcorlu/connect-api-mocker) 패키지의 도움을 받자.  
-특정 목업 폴더를 만들어 api 응답을 담은 파일을 저장한 뒤, 이 폴더를 api로 제공해 주는 기능을 한다.  
-
-먼저 이 패키지를 설치하고,
-~~~
-❯ npm i -D connect-api-mocker
-~~~
-
-mocks/api/keywords/GET.json 경로에 API 응답 파일을 만든다.  
-GET 메소드를 사용하기 때문에, GET.json으로 파일을 만들었다.(POST, PUT, DELETE도 지원)
-##### GET.json
-~~~
-[
-  { "keyword": "이탈리아" }, 
-  { "keyword": "세프의요리" }, 
-  { "keyword": "제철" }, 
-  { "keyword": "홈파티 " }
-]
-~~~
-기존에 설정한 목업 응답 컨트롤러를 제거하고 connect-api-mocker로 미들웨어를 대신한다.  
-~~~
-// webpack.config.js
-const apiMocker = require('connect-api-mocker')
-
-module.exports = {
-  devServer: {
-    before: (app, server, compiler) => {
-      app.use(apiMocker('/api', 'mocks/api'))
-    },
-  }
-}
-~~~
-Express 객체인 app는 get() 메소드뿐만 아니라 미들웨어 추가를 위한 범용 메서드 use()를 제공하는데, 이를 사용해 목업 미들웨어를 추가했다.  
-첫번째 인자는 설정할 라우팅 경로, 두번째 인자는 응답으로 제공할 목업 파일 경로로 방금 만든 mocks/api 경로를 전달  
-
-목업 API 개수가 많다면 직접 컨트롤러를 작성하는 것보다 목업 파일로 관리하는 것을 추천
-
-## 4.2.3 실제 API 연동: devServer.proxy
+## 4.2.1 실제 API 연동: devServer.proxy
 localhost:8080에서 localhost:8081 호출할 경우, 즉 다른 서버로 호출할 경우 CORS(Cross Origin Resource Sharing) 정책에 위반된다.  
 CORS 브라우저와 서버간의 보안상의 정책인데 브라우저가 최초로 접속한 서버에서만 요청을 할 수 있다.  
 
@@ -437,33 +366,3 @@ module.exports = {
 }
 ~~~
 개발 서버에 들어온 모든 http 요청 중 '/api'로 시작되는 것은 'http://localhost:8081'로 요청하는 설정이다.
-
-## 4.3. 최적화
-코드가 많아지면 번들링된 결과물도 커지기 마련이다. 거위 메가바이트 단위로 커질 수도 있는데 당연히 브라우저 성능에 영향을 준다. 파일을 다운로드 하는데 시간이 많이 걸리기 때문이다.  
-이번 섹션에서는 번들링한 결과물을 어떻게 최적화할 수 있는지 몇 가지 방법에 대해 알아본다.  
-
-### 4.3.1 production 모드
-웹팩에 내장되어 있는 최적화 방법 중 [mode](https://webpack.js.org/configuration/mode/) 값을 설정하는 방식이 가장 기본이다.  
-DefinePlugin을 사용 시, mode를 "development"로 설정하면 process.env.NODE_ENV 값이 "development"로 설정되어 어플리케이션에 전역변수로 주입되고, 반면 mode를 "production"으로 설정하면 process.env.NODE_ENV 값이 "production"으로 설정된다.  
-
-그럼 환경변수 NODE_ENV 값에 따라 모드를 설정하도록 웹팩 설정 코드를 다음과 같이 추가할 수 있다.  
-~~~
-// webpack.config.js:
-const mode = process.env.NODE_ENV || 'development'; // 기본값을 development로 설정
-
-module.exports = {
-  mode,
-}
-~~~ 
-빌드 시에 이를 운영 모드로 설정하여 실행하도록 npm 스크립트를 추가한다.
-##### package.json
-~~~
-{
-  "scripts": {
-    "start": "webpack-dev-server --progress",
-    "build": "NODE_ENV=production webpack --progress"
-  }
-}
-~~~
-start는 개발 서버를 구동하기 때문에 환경변수를 설정하지 않고 기본값 development를 사용할 것이다.  
-배포용으로 만들 build는 환경변수를 production으로 설정했고 웹팩 mode에 설정된다. 
