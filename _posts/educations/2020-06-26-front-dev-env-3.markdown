@@ -503,6 +503,7 @@ module.exports = {
 ### 2. eslintrc에 prettier 규칙 추가하기
 * /lecture-frontend-dev-env
 ~~~
+❯ npm i -D prettier
 ❯ npm i -D eslint-plugin-prettier
 ~~~
 
