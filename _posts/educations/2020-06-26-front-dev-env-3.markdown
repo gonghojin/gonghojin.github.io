@@ -534,7 +534,7 @@ module.exports = {
     + 전반적으로 소스가 다듬어짐(세미콜론, 띄어쓰기 등)
 ![https://webpack.js.org/](/assets/educations/images/lab5_2.png)  
 
-# Lab 6. Prettier 실습: 3-lint/2-prettier
+# Lab 6. Prettier 실습: 4-webpack/1-dev-server 
 --
 ### 1. Lab6 브런치로 이동하기
 * /lecture-frontend-dev-env
