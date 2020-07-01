@@ -545,7 +545,7 @@ module.exports = {
 ~~~
 
 ### 2. express로 구현된 api 서버 실행시키기
-+ /edu/lecture-frontend-dev-env/server
++ /lecture-frontend-dev-env/server
 ~~~
 ❯ npm install
 ❯ npm start

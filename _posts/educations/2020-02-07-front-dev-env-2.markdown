@@ -298,4 +298,10 @@ module.exports = {
 개발 서버에 들어온 모든 http 요청 중 '/api'로 시작되는 것은 'http://localhost:8081'로 요청하는 설정이다.
 
 ---
-* LAB 6 - 웹팩 개벌 서버 실습   
+* LAB 6 - 웹팩 개벌 서버 실습
+    + 이번 실습은 api 서버를 먼저 실행시켜야 합니다. 따라서 해당 명령어를 먼저 실행시킨 후 진행해주세요.
+         + /lecture-frontend-dev-env/server  
+~~~
+              ❯ npm install
+              ❯ npm start
+~~~
