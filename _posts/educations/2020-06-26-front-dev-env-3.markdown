@@ -532,3 +532,45 @@ module.exports = {
 * /lecture-frontend-dev-env/src/app.js
     + 전반적으로 소스가 다듬어짐(세미콜론, 띄어쓰기 등)
 ![https://webpack.js.org/](/assets/educations/images/lab5_2.png)  
+
+# Lab 6. Prettier 실습: 3-lint/2-prettier
+--
+### 1. Lab6 브런치로 이동하기
+* /lecture-frontend-dev-env
+~~~
+❯ git checkout -f 4-webpack/1-dev-server 
+~~~
+~~~
+❯ npm install
+~~~
+
+### 2. express로 구현된 api 서버 실행시키기
++ /edu/lecture-frontend-dev-env/server
+~~~
+❯ npm install
+❯ npm start
+~~~
+
+### 3. 실행시킨 api 서버 webpack.config.js에서 binding시키기
++ /lecture-frontend-dev-env
+~~~
+❯ npm install
+❯ npm i -D webpack-dev-server
+~~~
+
++ /lecture-frontend-dev-env/webpack.config.js
+~~~
+  devServer: {
+    overlay: true,
+    stats: "errors-only",
+    // TODO: 여기에 api 서버 프록싱 설정을 추가하세요(http://localhost:8081)
+    proxy: {
+      "/api": "http://localhost:8081" // 프록시
+    }
+  },
+~~~
+
++  /lecture-frontend-dev-env/
+~~~
+❯ npm start
+~~~

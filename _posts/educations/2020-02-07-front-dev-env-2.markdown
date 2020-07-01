@@ -93,6 +93,9 @@ ESLint에서 기본으로 제공하는 설정 외에 자주 사용하는 두 가
 대화식 명령어로 진행되며, 답변에 따라 .eslintrc 파일을 자동으로 생성한다.
 
 ---
+* LAB 4 - 린트 실습   
+
+---
 
 ## 2. Prettier 
 프리티어는 코드를 "더" 예쁘게 다듬는다. ESLint의 역할 중 포매팅과 겹치는 부분이 있지만, 프리티어는 좀 더 일관적인 스타일로 코드를 다듬는다.  
@@ -183,7 +186,7 @@ console.log();
 ~~~
 ❯ npx eslint app.js --fix
 ~~~
-프리티어는 이 두 패키지를 함게 사용하는 [단순한 설정](https://prettier.io/docs/en/integrating-with-linters.html)을 제공하는데 아래 설정을 추가하면 된다.  
+프리티어는 이 두 패키지를 함께 사용하는 [단순한 설정](https://prettier.io/docs/en/integrating-with-linters.html)을 제공하는데 아래 설정을 추가하면 된다.  
 ##### eslintrc.js
 ~~~
 {
@@ -193,6 +196,9 @@ console.log();
   ]
 }
 ~~~
+
+---
+* LAB 5 - 프리티어 실습   
 
 ---
 ## 4. 웹팩(심화)
@@ -290,3 +296,6 @@ module.exports = {
 }
 ~~~
 개발 서버에 들어온 모든 http 요청 중 '/api'로 시작되는 것은 'http://localhost:8081'로 요청하는 설정이다.
+
+---
+* LAB 6 - 웹팩 개벌 서버 실습   

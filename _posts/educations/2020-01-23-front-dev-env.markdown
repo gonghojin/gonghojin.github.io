@@ -127,7 +127,7 @@ package.json에는 설치한 패키지 정보를 기록한다.
 간단히 웹팩으로 번들링 작업을 해보자.
 번들 작업을 하는 `webpack` 패키지와 웹팩 터미널 도구인 `webpack-cli`를 설치한다.  
 ~~~
-❯ yarn add -D webpack webpack-cli
+❯ npm install -D webpack webpack-cli
 ~~~
 설치가 완료되면 `node_modules/.bin` 폴더에 실행 가능한 명령어가 몇 개 생긴다.  
 (webpack 또는 webpack-cli를 실행하면 된다.) --help 옵션으로 사용 방법을 확인해 보자.  
@@ -180,8 +180,8 @@ module.exports = {
 
 ---
 
-* LAB 1 - 웹팩 엔트리 / 아웃풋 실습:   
- <https://github.com/nkiateam/lecture-frontend-dev-env/tree/1-webpack/1-entry>
+* LAB 1 - 웹팩 엔트리 / 아웃풋 실습   
+ 
  
  ---
 ### 3. 로더
@@ -289,7 +289,7 @@ CSS를 로딩하면 background-image: url(bg.png) 코드에 의해 동일 폴더
 module.exports = {
   module: {
     rules: [{
-      test: /\.png$/, // .png 확장자로 마치는 모든 파일
+      test: /\.(png|jpg)$/, // .png 또는 .jpg 확장자로 마치는 모든 파일
       loader: 'file-loader',
       options: {
         publicPath: './dist/', // prefix를 아웃풋 경로로 지정 
@@ -336,7 +336,6 @@ module.exports = {
 
 ---
 * LAB 2 - 웹팩 로더:     
-<https://github.com/nkiateam/lecture-frontend-dev-env/tree/1-webpack/2-loader>
  
  ---
 
@@ -449,6 +448,11 @@ console.log(api.domain) // 'http://dev.api.domain.com'
 ### 4.2.3 HtmlTemplatePlugin
 HtmlTemplatePlugin은 HTML 파일을 후처리하는 데 사용한다. 빌드타임의 값을 넣거나 코드를 압축할 수 있다.  
 
+사용을 위해선 먼저 패키지를 설치한다.
+~~~
+❯ npm install -D html-webpack-plugin
+~~~
+
 index.html 파일을 src/index.html로 옮긴 뒤, 다음과 같이 작성해 보자.
 ##### src/index.html
 ~~~
@@ -551,6 +555,10 @@ module.exports = {
 }
 ~~~
 
+---
+
+* LAB 3 - 웹팩 플러그인 실습   
+ 
 ---
 ### 5. Babel(바벨)
 #### 5.1. 배경
