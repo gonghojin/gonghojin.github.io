@@ -312,7 +312,7 @@ module.exports = {
 ### 5. "TODO: MiniCssExtractPlugin: 모듈에서 css 파일을 분리하세요." 해결하기
 + /lecture-frontend-dev-env
 ~~~
-❯ npm install -D npm install -D mini-css-extract-plugin
+❯ npm install -D mini-css-extract-plugin
 ~~~
 
 + /lecture-frontend-dev-env/webpack.config.js   
